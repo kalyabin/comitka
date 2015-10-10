@@ -1,0 +1,7 @@
+RewriteEngine On
+RewriteBase /
+# yii2 route to entry point 
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . index.php
+

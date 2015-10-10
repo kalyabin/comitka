@@ -1,0 +1,12 @@
+{
+    "db" : {
+        "host" : "localhost",
+        "name" : "database_name",
+        "username" : "username",
+        "password" : "password"
+    },
+    "host" : {
+        "info" : "http://example.com",
+        "baseUrl" : "/"
+    }
+}
