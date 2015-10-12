@@ -1,9 +1,11 @@
 <?php
 namespace app\commands;
 
+use Yii;
 use user\models\User;
 use yii\console\Controller;
 use yii\helpers\Console;
+use Exception;
 
 /**
  * Manage systems users. Create new administrators, etc.
@@ -73,12 +75,17 @@ class UsersController extends Controller
             return self::EXIT_CODE_ERROR;
         }
 
-        if (!$user->save()) {
+        /* @var $api \user\Module */
+        $api = Yii::$app->getModule('user');
+
+        try {
+            $api->createAdmin($user);
+            $this->stdout('User successfully created. ID: ' . $user->id . "\n", Console::FG_GREEN);
+        }
+        catch (Exception $ex) {
             // Database error
             $this->stdout('Database error.' . "\n", Console::FG_RED);
             return self::EXIT_CODE_ERROR;
         }
-
-        $this->stdout('User successfully created. ID: ' . $user->id . "\n", Console::FG_GREEN);
     }
 }

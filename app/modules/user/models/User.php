@@ -86,7 +86,9 @@ class User extends ActiveRecord implements IdentityInterface
     public function beforeSave($insert)
     {
         if ($this->newPassword) {
-            $this->password = Yii::$app->getModule('user')->getPasswordHash($this->newPassword);
+            /* @var $api \user\Module */
+            $api = Yii::$app->getModule('user');
+            $this->password = $api->getPasswordHash($this->newPassword);
         }
         return parent::beforeSave($insert);
     }
