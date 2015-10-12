@@ -17,10 +17,10 @@ $config = ArrayHelper::merge([
     'basePath' => dirname(__DIR__),
     'sourceLanguage' => 'en-US',
     'bootstrap' => ['log'],
-    'aliases' => [
+    'aliases' => ArrayHelper::merge([
         '@' => dirname(__DIR__),
         '@app' => dirname(__DIR__),
-    ],
+    ], include __DIR__ . '/aliases.php'),
     'components' => [
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
@@ -45,7 +45,7 @@ $config = ArrayHelper::merge([
         ],
         'db' => [
             'class' => 'yii\db\Connection',
-            'charset' => 'utf-8',
+            'charset' => 'utf8',
             'tablePrefix' => 'app_',
             'dsn' => "mysql:host={$localParams['db']['host']};dbname={$localParams['db']['name']}",
             'username' => $localParams['db']['username'],
@@ -63,6 +63,11 @@ $config = ArrayHelper::merge([
                     'levels' => ['error', 'warning'],
                 ],
             ],
+        ],
+    ],
+    'modules' => [
+        'user' => [
+            'class' => 'user\Module',
         ],
     ],
     'params' => [
