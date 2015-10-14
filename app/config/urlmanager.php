@@ -8,5 +8,8 @@ return [
     'enablePrettyUrl' => true,
     'showScriptName' => false,
     'rules' => [
+        '/' => 'main/index',
+        '/sign-in' => '/user/auth/sign-in',
+        '/sign-out' => '/user/auth/sign-out',
     ],
 ];

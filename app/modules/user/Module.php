@@ -2,6 +2,7 @@
 namespace user;
 
 use Exception;
+use user\components\Auth;
 use user\models\User;
 use Yii;
 use yii\base\Module as BaseModule;
@@ -89,5 +90,40 @@ class Module extends BaseModule
             $transaction->rollBack();
             throw $ex;
         }
+    }
+
+    /**
+     * Returns true if password is correct user's password.
+     *
+     * @param User $user
+     * @param string $password
+     * @return boolean
+     */
+    public function checkUserPassword(User $user, $password)
+    {
+        return Yii::$app->security->validatePassword($password, $user->password);
+    }
+
+    /**
+     * Sign in user.
+     * Return true if it's ok.
+     * Send password to validate it.
+     *
+     * @param User $user user's identity object
+     * @param string $password user's password to validate
+     * @param integer $duration login duration at seconds
+     * @return boolean
+     */
+    public function signInUser(User $user, $password, $duration = null)
+    {
+        if (is_null($duration)) {
+            $duration = 24*60*60*30*24;
+        }
+        /* @var $auth Auth */
+        $auth = Yii::$app->user;
+        if ($user->canSignIn() && $this->checkUserPassword($user, $password)) {
+            return $auth->login($user, $duration);
+        }
+        return false;
     }
 }

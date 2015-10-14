@@ -17,5 +17,14 @@ return ArrayHelper::merge($common, [
         'assetManager' => [
             'linkAssets' => true,
         ],
+        'systemAlert' => [
+            'class' => '\app\components\Alert',
+        ],
+        'user' => [
+            'class' => '\user\components\Auth',
+            'identityClass' => '\user\models\User',
+            'enableAutoLogin' => true,
+            'loginUrl' => ['/user/auth/sign-in'],
+        ]
     ],
 ]);

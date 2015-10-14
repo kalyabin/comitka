@@ -147,4 +147,24 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return $this->getAuthKey() == $authKey;
     }
+
+    /**
+     * Return's true if a user can sign in.
+     *
+     * @return boolean
+     */
+    public function canSignIn()
+    {
+        return $this->status == self::STATUS_ACTIVE;
+    }
+
+    /**
+     * Get username
+     *
+     * @return string
+     */
+    public function getUserName()
+    {
+        return $this->email;
+    }
 }
