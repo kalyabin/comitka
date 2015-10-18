@@ -13,5 +13,6 @@ return [
         '/sign-out' => '/user/auth/sign-out',
         '/forgot-password' => '/user/auth/forgot-password',
         '/change-password/<hash:([\w]+)>' => '/user/auth/change-password',
+        '/profile' => '/user/profile/index',
     ],
 ];

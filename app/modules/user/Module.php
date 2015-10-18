@@ -4,6 +4,7 @@ namespace user;
 use Exception;
 use user\components\Auth;
 use user\models\ChangePasswordForm;
+use user\models\ProfileForm;
 use user\models\User;
 use user\models\UserChecker;
 use Yii;
@@ -185,6 +186,60 @@ class Module extends BaseModule
         ->setTo($user->email)
         ->setSubject(Yii::t('user', 'Forgot password'))
         ->send();
+    }
+
+    /**
+     * Change user's profile from form.
+     * TODO: implements avatars and e-mail change (?).
+     *
+     * @param ProfileForm $form
+     * @param User $user
+     * @return boolean
+     */
+    public function changeUserProfile(ProfileForm $form, User $user)
+    {
+        if (!$form->validate()) {
+            // form is not valid
+            return false;
+        }
+
+        $user->name = $form->name;
+        try {
+            if (!$user->save()) {
+                throw new Exception();
+            }
+        } catch (Exception $ex) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Change user's password from profile
+     *
+     * @param ChangePasswordForm $form
+     * @param User $user
+     * @return boolean
+     */
+    public function changeUserPassword(ChangePasswordForm $form, User $user)
+    {
+        if (!$form->validate()) {
+            // form is not valid
+            return false;
+        }
+
+        $user->newPassword = $form->password;
+        try {
+            if (!$user->save()) {
+                throw new Exception();
+            }
+        }
+        catch (Exception $ex) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

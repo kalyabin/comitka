@@ -11,10 +11,6 @@ $form = ActiveForm::begin([
     'id' => 'change-password',
     'enableAjaxValidation' => true,
     'enableClientValidation' => true,
-    'validateOnSubmit' => true,
-    'validateOnChange' => false,
-    'validateOnType' => false,
-    'validateOnBlur' => false,
 ]);
     print $form->field($model, 'password')->passwordInput();
     print $form->field($model, 'confirmPassword')->passwordInput();

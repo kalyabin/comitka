@@ -21,6 +21,16 @@ use yii\web\IdentityInterface;
 class User extends ActiveRecord implements IdentityInterface
 {
     /**
+     * Max name length
+     */
+    const MAX_NAME_LENGTH = 100;
+
+    /**
+     * Max e-mail length
+     */
+    const MAX_EMAIL_LENGTH =100;
+
+    /**
      * User is an unactive
      */
     const STATUS_UNACTIVE = 0;
@@ -60,7 +70,8 @@ class User extends ActiveRecord implements IdentityInterface
             ['email', 'unique'],
             ['status', 'integer'],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_UNACTIVE, self::STATUS_BLOCKED]],
-            [['name', 'email'], 'string', 'max' => 100],
+            ['name', 'string', 'max' => self::MAX_NAME_LENGTH],
+            ['email', 'string', 'max' => self::MAX_EMAIL_LENGTH],
             ['password', 'string', 'max' => 255],
             ['password', 'required', 'when' => function($data) {
                 /* @var $data User */

@@ -1,10 +1,11 @@
 <?php
+
 use app\assets\CommonAsset;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\web\View;
-use yii\widgets\Breadcrumbs;
 
 /* @var $this View */
 /* @var $content string */
@@ -43,7 +44,7 @@ CommonAsset::register($this);
         $authItems[] = [
             'label' => Html::tag('span', '', ['class' => 'glyphicon glyphicon-user']) .
                 '&nbsp;&nbsp;' . Yii::$app->user->identity->getUserName() . '',
-            'url' => '#',
+            'url' => Url::to(['/user/profile/index']),
         ];
         $authItems[] = [
             'label' => Html::tag('small', Yii::t('user', 'Sign out')),

@@ -8,6 +8,7 @@ use user\models\SignInForm;
 use user\models\User;
 use user\Module as UserModule;
 use Yii;
+use yii\base\Model;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
@@ -21,6 +22,20 @@ use yii\widgets\ActiveForm;
 class AuthController extends Controller
 {
     public $layout = '@app/views/layouts/one-column';
+
+    /**
+     * @var UserModule
+     */
+    protected $userModule;
+
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        parent::init();
+        $this->userModule = Yii::$app->getModule('user');
+    }
 
     /**
      * @inheritdoc
@@ -64,11 +79,8 @@ class AuthController extends Controller
      */
     public function actionChangePassword($hash)
     {
-        /* @var $api UserModule */
-        $api = Yii::$app->getModule('user');
-
         // find a user
-        $user = $api->findUserByChecker('email_checker', $hash);
+        $user = $this->userModule->findUserByChecker('email_checker', $hash);
 
         if (!$user instanceof User) {
             // user not found
@@ -77,16 +89,16 @@ class AuthController extends Controller
 
         $model = new ChangePasswordForm();
 
-        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+        $ret = $this->performAjaxValidation($model);
+        if (is_array($ret)) {
             // AJAX validation
-            Yii::$app->response->format = Response::FORMAT_JSON;
-            return ActiveForm::validate($model);
+            return $ret;
         }
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             /* @var $systemAlert Alert */
             $systemAlert = Yii::$app->systemAlert;
-            if ($api->changeUserForgottenPassword($model, $user)) {
+            if ($this->userModule->changeUserForgottenPassword($model, $user)) {
                 $systemAlert->setMessage(Alert::INFO, Yii::t('user', 'Password successfully changed.'));
                 return $this->goHome();
             }
@@ -109,22 +121,20 @@ class AuthController extends Controller
     {
         $model = new ForgotPasswordForm();
 
-        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+        $ret = $this->performAjaxValidation($model);
+        if (is_array($ret)) {
             // AJAX validation
-            Yii::$app->response->format = Response::FORMAT_JSON;
-            return ActiveForm::validate($model);
+            return $ret;
         }
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            /* @var $api UserModule */
-            $api = Yii::$app->getModule('user');
             /* @var $user User */
             $user = $model->getUser();
             /* @var $systemAlert Alert */
             $systemAlert = Yii::$app->systemAlert;
 
             // send forgot password e-mail
-            if ($api->sendForgotPasswordEmail($user)) {
+            if ($this->userModule->sendForgotPasswordEmail($user)) {
                 $systemAlert->setMessage(Alert::INFO, Yii::t('user', 'E-mail to change password successfully sent.'));
                 return $this->refresh();
             }
@@ -147,17 +157,15 @@ class AuthController extends Controller
     {
         $model = new SignInForm();
 
-        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+        $ret = $this->performAjaxValidation($model);
+        if (is_array($ret)) {
             // AJAX validation
-            Yii::$app->response->format = Response::FORMAT_JSON;
-            return ActiveForm::validate($model);
+            return $ret;
         }
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            /* @var $api UserModule */
-            $api = Yii::$app->getModule('user');
             $user = $model->getUser();
-            if ($user instanceof User && $api->signInUser($user, $model->password)) {
+            if ($user instanceof User && $this->userModule->signInUser($user, $model->password)) {
                 return $this->goHome();
             }
 
@@ -171,5 +179,21 @@ class AuthController extends Controller
         return $this->render('sign-in', [
             'model' => $model,
         ]);
+    }
+
+    /**
+     * Performs model ajax validation
+     *
+     * @param Model $model
+     * @return array|null
+     */
+    protected function performAjaxValidation(Model $model)
+    {
+        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+            // AJAX validation
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
+        }
+        return null;
     }
 }

@@ -11,10 +11,6 @@ $form = ActiveForm::begin([
     'id' => 'forgot-password',
     'enableAjaxValidation' => true,
     'enableClientValidation' => true,
-    'validateOnSubmit' => true,
-    'validateOnChange' => false,
-    'validateOnType' => false,
-    'validateOnBlur' => false,
 ]);
     print $form->field($model, 'email')->textInput();
     print Html::submitButton(Yii::t('user', 'Send'), ['class' => 'btn btn-primary']);
