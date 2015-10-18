@@ -33,7 +33,7 @@ class Alert extends Component
      */
     public function setMessage($type, $message)
     {
-        Yii::$app->setFlash('system-alert', [
+        Yii::$app->session->setFlash('system-alert', [
             'type' => $type,
             'message' => $message,
         ]);
@@ -46,7 +46,7 @@ class Alert extends Component
      */
     public function viewMessage()
     {
-        $alert = Yii::$app->getFlash('system-alert');
+        $alert = Yii::$app->session->getFlash('system-alert');
         $type = ArrayHelper::getValue($alert, 'type', self::INFO);
         $message = ArrayHelper::getValue($alert, 'message', '');
         if (!empty($message)) {

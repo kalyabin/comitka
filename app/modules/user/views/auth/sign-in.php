@@ -8,21 +8,21 @@ use yii\widgets\ActiveForm;
 /* @var $model SignInForm */
 /* @var $form ActiveForm */
 
-print Html::tag('div', '', ['class' => 'col-md-3 col-sm-1']);
-print Html::beginTag('div', ['class' => 'sign-in-form col-md-6 col-sm-10']);
-    print Html::tag('h3', Yii::t('user', 'Sign in'));
-    $form = ActiveForm::begin([
-        'id' => 'sign-in',
-        'enableAjaxValidation' => true,
-        'enableClientValidation' => true,
-        'validateOnSubmit' => true,
-        'validateOnChange' => false,
-        'validateOnType' => false,
-        'validateOnBlur' => false,
-    ]);
-        print $form->field($model, 'email')->textInput();
-        print $form->field($model, 'password')->passwordInput();
-        print Html::submitButton(Yii::t('user', 'Sign in'), ['class' => 'btn btn-primary']);
-    ActiveForm::end();
-print Html::endTag('div');
-print Html::tag('div', '', ['class' => 'col-md-3 col-sm-1']);
+print Html::tag('h3', Yii::t('user', 'Sign in'));
+$form = ActiveForm::begin([
+    'id' => 'sign-in',
+    'enableAjaxValidation' => true,
+    'enableClientValidation' => true,
+    'validateOnSubmit' => true,
+    'validateOnChange' => false,
+    'validateOnType' => false,
+    'validateOnBlur' => false,
+]);
+    print $form->field($model, 'email')->textInput();
+    print $form->field($model, 'password')->passwordInput();
+    print Html::submitButton(Yii::t('user', 'Sign in'), ['class' => 'btn btn-primary']);
+    print '&nbsp;&nbsp;';
+    print Html::beginTag('strong');
+        print Html::a(Yii::t('user', 'Forgot password...'), \yii\helpers\Url::to(['forgot-password']));
+    print Html::endTag('strong');
+ActiveForm::end();

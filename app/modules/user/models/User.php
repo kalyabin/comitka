@@ -2,7 +2,9 @@
 
 namespace user\models;
 
+use user\Module as UserModule;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 
@@ -14,6 +16,7 @@ use yii\web\IdentityInterface;
  * @property string $email
  * @property string $password
  * @property integer $status
+ * @property UserChecker $checker
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -86,7 +89,7 @@ class User extends ActiveRecord implements IdentityInterface
     public function beforeSave($insert)
     {
         if ($this->newPassword) {
-            /* @var $api \user\Module */
+            /* @var $api UserModule */
             $api = Yii::$app->getModule('user');
             $this->password = $api->getPasswordHash($this->newPassword);
         }
@@ -166,5 +169,22 @@ class User extends ActiveRecord implements IdentityInterface
     public function getUserName()
     {
         return $this->email;
+    }
+
+    /**
+     * Return's ActiveQuery to find user's checker.
+     * If model not exists - create it.
+     *
+     * @return ActiveQuery
+     */
+    public function getChecker()
+    {
+        if (!$this->hasOne(UserChecker::className(), ['user_id' => 'id'])->exists()) {
+            // create new model if not exists
+            $newModel = new UserChecker();
+            $newModel->user_id = $this->id;
+            $newModel->save();
+        }
+        return $this->hasOne(UserChecker::className(), ['user_id' => 'id']);
     }
 }
