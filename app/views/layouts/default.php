@@ -32,9 +32,16 @@ CommonAsset::register($this);
             'class' => 'navbar navbar-inverse navbar-fixed-top',
         ],
     ]);
+    $navItems = [];
+    if (Yii::$app->user->can('createUser') || Yii::$app->user->can('updateUser') || Yii::$app->user->can('deleteUser')) {
+        $navItems[] = [
+            'label' => Yii::t('user', 'Users'),
+            'url' => ['/user/manager/index'],
+        ];
+    }
     print Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-left'],
-        'items' => [],
+        'items' => $navItems,
     ]);
     $authItems = [];
     if (Yii::$app->user->isGuest) {

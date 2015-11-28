@@ -198,4 +198,29 @@ class User extends ActiveRecord implements IdentityInterface
         }
         return $this->hasOne(UserChecker::className(), ['user_id' => 'id']);
     }
+
+    /**
+     * Returns statuses list
+     *
+     * @return array
+     */
+    public function getStatuses()
+    {
+        return [
+            self::STATUS_ACTIVE => \Yii::t('user', 'Active'),
+            self::STATUS_UNACTIVE => \Yii::t('user', 'Unactive'),
+            self::STATUS_BLOCKED => \Yii::t('user', 'Blocked'),
+        ];
+    }
+
+    /**
+     * Returns status name
+     *
+     * @return string
+     */
+    public function getStatusName()
+    {
+        $statuses = $this->getStatuses();
+        return isset($statuses[$this->status]) ? $statuses[$this->status] : null;
+    }
 }

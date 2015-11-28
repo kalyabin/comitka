@@ -7,6 +7,7 @@ use user\models\ChangePasswordForm;
 use user\models\ProfileForm;
 use user\models\User;
 use user\models\UserChecker;
+use user\models\UserForm;
 use Yii;
 use yii\base\Module as BaseModule;
 use yii\helpers\Url;
@@ -152,32 +153,47 @@ class Module extends BaseModule
     }
 
     /**
-     * Send forgot password e-mail.
-     * Generates new e-mail checker hash if not exists.
+     * Get user check string.
      *
-     * @param User $user
-     * @return boolean
+     * @param User $user user model
+     * @param string $field checker type
+     * @return string|null
      * @throws Exception
      */
-    public function sendForgotPasswordEmail(User $user)
+    protected function getUserChecker(User $user, $field = 'email_checker')
     {
         $checker = $user->checker;
-        if (!trim($checker->email_checker)) {
+        if (!trim($checker->{$field})) {
             // generate new e-mail checker hash
             try {
-                $checker->email_checker = md5($user->id . $user->email . time());
-                if (!$checker->save(false, ['email_checker'])) {
+                $checker->{$field} = md5($user->id . $user->email . time());
+                if (!$checker->save(false, [$field])) {
                     throw new Exception();
                 }
             }
             catch (Exception $ex) {
-                return false;
+                return null;
             }
         }
 
+        return $checker->{$field};
+    }
+
+    /**
+     * Send forgot password e-mail.
+     * Generates new e-mail checker hash if not exists.
+     *
+     * @param User $user
+     * @return boolean true if successfully sent
+     * @throws Exception
+     */
+    public function sendForgotPasswordEmail(User $user)
+    {
+        $checker = $this->getUserChecker($user, 'email_checker');
+
         // send e-mail
         $changePasswordLink = Url::toRoute(['/user/auth/change-password',
-            'hash' => $checker->email_checker
+            'hash' => $checker,
         ], true);
         return Yii::$app->mailer->compose('userChangeForgotPassword', [
             'user' => $user,
@@ -278,5 +294,164 @@ class Module extends BaseModule
         }
 
         return true;
+    }
+
+    /**
+     * Update user roles
+     *
+     * @param UserForm $user
+     */
+    protected function updateRoles(UserForm $user)
+    {
+        /* @var $authManager DbManager */
+        $authManager = Yii::$app->authManager;
+        /* @var $db Connection */
+        $db = $authManager->db;
+
+        // remove exists roles
+        $db->createCommand()
+            ->delete($authManager->assignmentTable, 'user_id=:user_id', [
+                ':user_id' => $user->id,
+            ])
+            ->execute();
+
+        // create new roles
+        if (is_array($user->roles)) {
+            foreach ($user->roles as $role) {
+                $role = $authManager->getRole($role);
+                $authManager->assign($role, $user->id);
+            }
+        }
+    }
+
+    /**
+     * Update user and send notification
+     *
+     * @param UserForm $user
+     * @return boolean true if successfully updated
+     * @throws Exception
+     */
+    public function updateUser(UserForm $user)
+    {
+        if ($user->isNewRecord || !$user->validate()) {
+            // only exists validated users record
+            return false;
+        }
+
+        $newPassword = $user->newPassword;
+
+        if ($user->generateRandomPassword) {
+            // generate new random password
+            $newPassword = $user->newPassword = Yii::$app->security->generateRandomString(10);
+        }
+        else if ($user->newPassword) {
+            // new password typed at form
+            $newPassword = $user->newPassword;
+        }
+
+        $transaction = $user->getDb()->beginTransaction();
+
+        try {
+            $user->save();
+            $this->updateRoles($user);
+            $transaction->commit();
+        }
+        catch (Exception $ex) {
+            $transaction->rollBack();
+            throw $ex;
+        }
+
+        if ($user->sendNotification && $newPassword) {
+            // send e-mail
+             Yii::$app->mailer->compose('userNewPassword', [
+                'user' => $user,
+                'newPassword' => $newPassword,
+            ])
+            ->setTo($user->email)
+            ->setSubject(Yii::t('user', 'New password'))
+            ->send();
+        }
+
+        return true;
+    }
+
+    /**
+     * Activate user
+     *
+     * @param UserForm $user
+     * @return boolean
+     */
+    public function activateUser(UserForm $user)
+    {
+        if ($user->isNewRecord) {
+            return false;
+        }
+
+        $user->status = User::STATUS_ACTIVE;
+        return $user->save(false, ['status']);
+    }
+
+    /**
+     * Lock user
+     *
+     * @param UserForm $user
+     * @return boolean
+     */
+    public function lockUser(UserForm $user)
+    {
+        if ($user->isNewRecord) {
+            return false;
+        }
+
+        $user->status = User::STATUS_BLOCKED;
+        return $user->save(false, ['status']);
+    }
+
+    /**
+     * Create new user and send notification
+     *
+     * @param UserForm $user
+     * @return boolean true if success
+     * @throws Exception
+     */
+    public function createUser(UserForm $user)
+    {
+        if (!$user->isNewRecord || !$user->validate()) {
+            // only new validated users record
+            return false;
+        }
+
+        $transaction = $user->getDb()->beginTransaction();
+        try {
+            // generate new random password
+            $user->newPassword = Yii::$app->security->generateRandomString(32);
+            $user->status = User::STATUS_ACTIVE;
+            $user->save();
+
+            $this->updateRoles($user);
+
+            if ($user->sendNotification) {
+                // send user's notification
+                $changePasswordLink = Url::toRoute(['/user/auth/change-password',
+                    'hash' => $this->getUserChecker($user, 'email_checker'),
+                ], true);
+                Yii::$app->mailer->compose('userNewNotification', [
+                    'user' => $user,
+                    'link' => $changePasswordLink,
+                ])
+                ->setTo($user->email)
+                ->setSubject(Yii::t('user', 'Account created'))
+                ->send();
+            }
+
+            $transaction->commit();
+
+            return true;
+        } catch (Exception $ex) {
+            $transaction->rollBack();
+            throw $ex;
+        }
+
+        return false;
     }
 }

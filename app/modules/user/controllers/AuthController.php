@@ -99,6 +99,10 @@ class AuthController extends Controller
             /* @var $systemAlert Alert */
             $systemAlert = Yii::$app->systemAlert;
             if ($this->userModule->changeUserForgottenPassword($model, $user)) {
+                if ($user->canSignIn()) {
+                    // authorize user
+                    $this->userModule->signInUser($user, $model->password);
+                }
                 $systemAlert->setMessage(Alert::INFO, Yii::t('user', 'Password successfully changed.'));
                 return $this->goHome();
             }
