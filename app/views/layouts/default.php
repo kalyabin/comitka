@@ -29,7 +29,7 @@ CommonAsset::register($this);
         'brandLabel' => 'Comitka',
         'brandUrl' => Yii::$app->urlManager->getHostInfo(),
         'options' => [
-            'class' => 'navbar navbar-inverse navbar-fixed-top',
+            'class' => 'navbar navbar-default navbar-fixed-top',
         ],
     ]);
     $navItems = [];
