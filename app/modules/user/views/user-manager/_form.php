@@ -28,7 +28,11 @@ if (!$model->isNewRecord) {
 print $form->field($model, 'sendNotification')->checkbox();
 
 print Html::tag('h2', Yii::t('user', 'Permissions'));
-print $form->field($model, 'roles')->checkboxList($model->getRolesList());
+print $form->field($model, 'roles')->checkboxList($model->getRolesList(), [
+    'itemOptions' => [
+        'labelOptions' => ['style' => 'display:block;'],
+    ]
+]);
 
 if ($model->isNewRecord) {
     print Html::submitButton(Yii::t('user', 'Create'), ['class' => 'btn btn-primary']);

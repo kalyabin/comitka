@@ -33,11 +33,24 @@ CommonAsset::register($this);
         ],
     ]);
     $navItems = [];
-    if (Yii::$app->user->can('createUser') || Yii::$app->user->can('updateUser') || Yii::$app->user->can('deleteUser')) {
-        $navItems[] = [
+    if (Yii::$app->user->can('createUser') || Yii::$app->user->can('updateUser') || Yii::$app->user->can('deleteUser') || Yii::$app->user->can('manageRole')) {
+        $userItems = [
             'label' => Yii::t('user', 'Users'),
-            'url' => ['/user/manager/index'],
+            'items' => [],
         ];
+        if (Yii::$app->user->can('createUser') || Yii::$app->user->can('updateUser') || Yii::$app->user->can('deleteUser')) {
+            $userItems['items'][] = [
+                'label' => Yii::t('user', 'Users list'),
+                'url' => ['/user/user-manager/index'],
+            ];
+        }
+        if (Yii::$app->user->can('manageRole')) {
+            $userItems['items'][] = [
+                'label' => Yii::t('user', 'Roles list'),
+                'url' => ['/user/role-manager/index'],
+            ];
+        }
+        $navItems[] = $userItems;
     }
     print Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-left'],

@@ -21,7 +21,7 @@ use yii\widgets\ActiveForm;
  * - update users and send notification;
  * - delete or lock exists users.
  */
-class ManagerController extends Controller
+class UserManagerController extends Controller
 {
     /**
      * @var Module
