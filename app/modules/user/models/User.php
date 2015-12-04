@@ -2,7 +2,7 @@
 
 namespace user\models;
 
-use user\Module as UserModule;
+use user\UserModule;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;

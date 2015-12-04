@@ -20,5 +20,8 @@ return [
         '/roles' => '/user/role-manager/index',
         '/roles/create' => '/user/role-manager/create',
         '/roles/<action:(update|delete)>/<id:(\w+)>' => '/user/role-manager/<action>',
+        '/projects' => '/project/project/index',
+        '/projects/<id:(\d+)>/<action:(update|delete)>' => '/project/project/<action>',
+        '/projects/create' => '/project/project/create',
     ],
 ];

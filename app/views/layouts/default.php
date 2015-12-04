@@ -32,7 +32,12 @@ CommonAsset::register($this);
             'class' => 'navbar navbar-default navbar-fixed-top',
         ],
     ]);
-    $navItems = [];
+    $navItems = [
+        [
+            'label' => Yii::t('project', 'Projects'),
+            'url' => ['/project/project/index'],
+        ],
+    ];
     if (Yii::$app->user->can('createUser') || Yii::$app->user->can('updateUser') || Yii::$app->user->can('deleteUser') || Yii::$app->user->can('manageRole')) {
         $userItems = [
             'label' => Yii::t('user', 'Users'),

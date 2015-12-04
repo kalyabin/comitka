@@ -1,13 +1,14 @@
 <?php
-namespace user\controllers;
+
+namespace project\controllers;
 
 use app\components\Alert;
 use app\components\AuthControl;
 use Exception;
-use user\models\UserForm;
-use user\models\UserSearch;
-use user\UserModule;
+use project\models\Project;
+use project\ProjectModule;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -15,18 +16,19 @@ use yii\web\Response;
 use yii\widgets\ActiveForm;
 
 /**
- * Controller to manage users:
+ * Controller to manage projects:
  *
- * - create new users and send notification;
- * - update users and send notification;
- * - delete or lock exists users.
+ * - view project list;
+ * - create new projects;
+ * - update projects;
+ * - delete exists projects;
  */
-class UserManagerController extends Controller
+class ProjectController extends Controller
 {
     /**
-     * @var UserModule
+     * @var ProjectModule
      */
-    protected $userModule;
+    protected $projectModule;
 
     /**
      * @inheritdoc
@@ -34,7 +36,7 @@ class UserManagerController extends Controller
     public function init()
     {
         parent::init();
-        $this->userModule = Yii::$app->getModule('user');
+        $this->projectModule = Yii::$app->getModule('project');
     }
 
     /**
@@ -48,23 +50,24 @@ class UserManagerController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['createUser', 'updateUser', 'deleteUser'],
+                        'roles' => ['@'],
                         'actions' => ['index'],
                     ],
                     [
                         'allow' => true,
-                        'roles' => ['createUser'],
+                        'roles' => ['createProject'],
                         'actions' => ['create'],
                     ],
                     [
                         'allow' => true,
-                        'roles' => ['updateUser'],
+                        'roles' => ['updateProject'],
                         'actions' => ['update'],
                     ],
                     [
                         'allow' => true,
-                        'roles' => ['deleteUser'],
-                        'actions' => ['lock', 'activate'],
+                        'roles' => ['deleteProject'],
+                        'actions' => ['delete'],
+                        'verbs' => ['POST'],
                     ]
                 ],
             ]
@@ -72,36 +75,35 @@ class UserManagerController extends Controller
     }
 
     /**
-     * Users list
+     * Projects list
      *
-     * @return mixed
+     * @return string
      */
     public function actionIndex()
     {
-        $model = new UserSearch();
-        $dataProvider = $model->search(Yii::$app->request->get());
+        $query = Project::find();
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
 
         return $this->render('index', [
-            'model' => $model,
             'dataProvider' => $dataProvider,
         ]);
     }
 
     /**
-     * Create new user
+     * Create project form
      *
      * @return mixed
      */
     public function actionCreate()
     {
-        $this->layout = '@app/views/layouts/one-column';
-
-        $model = new UserForm();
-        $model->setScenario('create');
+        $model = new Project();
 
         if (Yii::$app->request->isAjax) {
-            Yii::$app->response->format = Response::FORMAT_JSON;
+            // AJAX-validation
             $model->load(Yii::$app->request->post());
+            Yii::$app->response->format = Response::FORMAT_JSON;
             return ActiveForm::validate($model);
         }
 
@@ -110,15 +112,14 @@ class UserManagerController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             try {
-                if ($this->userModule->createUser($model)) {
-                    $systemAlert->setMessage(Alert::SUCCESS, Yii::t('user', 'User successfully created'));
+                if ($model->save()) {
+                    $systemAlert->setMessage(Alert::SUCCESS, Yii::t('project', 'Project successfully created'));
                     return $this->redirect(['index']);
                 }
                 else {
-                    $systemAlert->setMessage(Alert::DANGER, Yii::t('user', 'Creation user error'));
+                    $systemAlert->setMessage(Alert::DANGER, Yii::t('project', 'Creation project error'));
                 }
-            }
-            catch (Exception $ex) {
+            } catch (Exception $ex) {
                 $systemAlert->setMessage(Alert::DANGER, Yii::t('app', 'System error: {message}', [
                     'message' => $ex->getMessage(),
                 ]));
@@ -131,27 +132,19 @@ class UserManagerController extends Controller
     }
 
     /**
-     * Update exits user model.
+     * Update project form
      *
-     * @param integer $id
+     * @param integer $id project identifier
      * @return mixed
-     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
-        $this->layout = '@app/views/layouts/one-column';
-
-        $model = UserForm::find()->andWhere(['id' => (int) $id])->one();
-
-        if (!$model instanceof UserForm) {
-            throw new NotFoundHttpException();
-        }
-
-        $model->setScenario('update');
+        $model = $this->findModel($id);
 
         if (Yii::$app->request->isAjax) {
-            Yii::$app->response->format = Response::FORMAT_JSON;
+            // AJAX-validation
             $model->load(Yii::$app->request->post());
+            Yii::$app->response->format = Response::FORMAT_JSON;
             return ActiveForm::validate($model);
         }
 
@@ -160,15 +153,14 @@ class UserManagerController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             try {
-                if ($this->userModule->updateUser($model)) {
-                    $systemAlert->setMessage(Alert::SUCCESS, Yii::t('user', 'User successfully updated'));
+                if ($model->save()) {
+                    $systemAlert->setMessage(Alert::SUCCESS, Yii::t('project', 'Project successfully updated'));
                     return $this->redirect(['index']);
                 }
                 else {
-                    $systemAlert->setMessage(Alert::DANGER, Yii::t('user', 'User update error'));
+                    $systemAlert->setMessage(Alert::DANGER, Yii::t('project', 'Project update error'));
                 }
-            }
-            catch (Exception $ex) {
+            } catch (Exception $ex) {
                 $systemAlert->setMessage(Alert::DANGER, Yii::t('app', 'System error: {message}', [
                     'message' => $ex->getMessage(),
                 ]));
@@ -181,27 +173,24 @@ class UserManagerController extends Controller
     }
 
     /**
-     * Users activation
+     * Remove project by identifier
      *
      * @param integer $id
      * @return mixed
-     * @throws NotFoundHttpException
      */
-    public function actionActivate($id)
+    public function actionDelete($id)
     {
-        $model = UserForm::find()->andWhere(['id' => (int) $id])->one();
-        if (!$model instanceof UserForm) {
-            throw new NotFoundHttpException();
-        }
+        $model = $this->findModel($id);
 
         /* @var $systemAlert Alert */
         $systemAlert = Yii::$app->systemAlert;
+
         try {
-            if ($this->userModule->activateUser($model)) {
-                $systemAlert->setMessage(Alert::SUCCESS, Yii::t('user', 'User successfully activated'));
+            if ($model->delete()) {
+                $systemAlert->setMessage(Alert::SUCCESS, Yii::t('project', 'Project successfully deleted'));
             }
             else {
-                $systemAlert->setMessage(Alert::SUCCESS, Yii::t('user', 'Error activation a user'));
+                $systemAlert->setMessage(Alert::DANGER, Yii::t('project', 'Project delete error'));
             }
         } catch (Exception $ex) {
             $systemAlert->setMessage(Alert::DANGER, Yii::t('app', 'System error: {message}', [
@@ -213,34 +202,18 @@ class UserManagerController extends Controller
     }
 
     /**
-     * Users locking
+     * Find project model by identifier
      *
      * @param integer $id
-     * @return mixed
+     * @return Project
      * @throws NotFoundHttpException
      */
-    public function actionLock($id)
+    protected function findModel($id)
     {
-        $model = UserForm::find()->andWhere(['id' => (int) $id])->one();
-        if (!$model instanceof UserForm) {
+        $model = Project::findOne($id);
+        if (!$model instanceof Project) {
             throw new NotFoundHttpException();
         }
-
-        /* @var $systemAlert Alert */
-        $systemAlert = Yii::$app->systemAlert;
-        try {
-            if ($this->userModule->lockUser($model)) {
-                $systemAlert->setMessage(Alert::SUCCESS, Yii::t('user', 'User successfully blocked'));
-            }
-            else {
-                $systemAlert->setMessage(Alert::SUCCESS, Yii::t('user', 'Error locking a user'));
-            }
-        } catch (Exception $ex) {
-            $systemAlert->setMessage(Alert::DANGER, Yii::t('app', 'System error: {message}', [
-                'message' => $ex->getMessage(),
-            ]));
-        }
-
-        return $this->redirect(['index']);
+        return $model;
     }
 }

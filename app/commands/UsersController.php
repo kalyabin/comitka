@@ -1,11 +1,12 @@
 <?php
 namespace app\commands;
 
-use Yii;
+use Exception;
 use user\models\User;
+use user\UserModule;
+use Yii;
 use yii\console\Controller;
 use yii\helpers\Console;
-use Exception;
 
 /**
  * Manage systems users. Create new administrators, etc.
@@ -75,7 +76,7 @@ class UsersController extends Controller
             return self::EXIT_CODE_ERROR;
         }
 
-        /* @var $api \user\Module */
+        /* @var $api UserModule */
         $api = Yii::$app->getModule('user');
 
         try {

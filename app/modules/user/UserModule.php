@@ -18,7 +18,7 @@ use yii\rbac\Item;
 /**
  * Provides API to manage users
  */
-class Module extends BaseModule
+class UserModule extends BaseModule
 {
     /**
      * Generate hash using original password

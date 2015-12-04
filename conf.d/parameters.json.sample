@@ -8,5 +8,8 @@
     "host" : {
         "info" : "http://example.com",
         "baseUrl" : "/"
+    },
+    "git": {
+        "cmd": "git"
     }
 }

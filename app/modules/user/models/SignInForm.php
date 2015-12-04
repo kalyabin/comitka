@@ -1,7 +1,7 @@
 <?php
 namespace user\models;
 
-use user\Module;
+use user\UserModule;
 use Yii;
 use yii\base\Model;
 
@@ -66,7 +66,7 @@ class SignInForm extends Model
                 $this->addError($attribute, Yii::t('user', 'Wrong user name or password'));
                 return;
             }
-            /* @var $api Module */
+            /* @var $api UserModule */
             $api = Yii::$app->getModule('user');
             if (!$api->checkUserPassword($this->user, $this->{$attribute})) {
                 $this->addError($attribute, Yii::t('user', 'Wrong user name or password'));

@@ -40,6 +40,10 @@ $config = ArrayHelper::merge([
                 ],
             ],
         ],
+        'gitWrapper' => [
+            'class' => 'GitView\GitWrapper',
+            'cmd' => isset($localParams['git']['cmd']) ? $localParams['git']['cmd'] : 'git',
+        ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
@@ -67,7 +71,10 @@ $config = ArrayHelper::merge([
     ],
     'modules' => [
         'user' => [
-            'class' => 'user\Module',
+            'class' => 'user\UserModule',
+        ],
+        'project' => [
+            'class' => 'project\ProjectModule',
         ],
     ],
     'params' => [

@@ -4,7 +4,7 @@ namespace user\controllers;
 use app\components\Alert;
 use user\models\ChangePasswordForm;
 use user\models\ProfileForm;
-use user\Module as UserModule;
+use user\UserModule;
 use Yii;
 use yii\base\Model;
 use yii\filters\AccessControl;

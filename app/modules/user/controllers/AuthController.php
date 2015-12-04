@@ -6,7 +6,7 @@ use user\models\ChangePasswordForm;
 use user\models\ForgotPasswordForm;
 use user\models\SignInForm;
 use user\models\User;
-use user\Module as UserModule;
+use user\UserModule;
 use Yii;
 use yii\base\Model;
 use yii\filters\AccessControl;
