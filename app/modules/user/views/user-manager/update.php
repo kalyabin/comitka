@@ -8,7 +8,7 @@ use yii\web\View;
 /* @var $model UserForm */
 
 print Html::tag('h1', Yii::t('user', 'Update user: {name}', [
-    'name' => $model->name,
+    'name' => Html::encode($model->name),
 ]));
 
 print $this->render('_form', [

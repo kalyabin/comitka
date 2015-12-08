@@ -25,15 +25,12 @@ print GridView::widget([
     'dataProvider' => $dataProvider,
     'filterModel' => $model,
     'columns' => [
-        [
-            'class' => SerialColumn::className(),
-        ],
         'id', 'name',
         [
             'attribute' => 'email',
             'value' => function($data) {
                 /* @var $data User */
-                return Yii::$app->user->can('updateUser') || Yii::$app->user->can('deleteUser') ? Html::a($data->email, ['update', 'id' => $data->id]) : $data->email;
+                return Yii::$app->user->can('updateUser') || Yii::$app->user->can('deleteUser') ? Html::a(Html::encode($data->email), ['update', 'id' => $data->id]) : $data->email;
             },
             'format' => 'html',
         ],

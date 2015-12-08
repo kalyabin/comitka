@@ -6,7 +6,6 @@ use app\components\Alert;
 use app\components\AuthControl;
 use Exception;
 use project\models\Project;
-use project\ProjectModule;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
@@ -25,20 +24,6 @@ use yii\widgets\ActiveForm;
  */
 class ProjectController extends Controller
 {
-    /**
-     * @var ProjectModule
-     */
-    protected $projectModule;
-
-    /**
-     * @inheritdoc
-     */
-    public function init()
-    {
-        parent::init();
-        $this->projectModule = Yii::$app->getModule('project');
-    }
-
     /**
      * @inheritdoc
      */

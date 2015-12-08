@@ -5,7 +5,7 @@ use yii\bootstrap\Html;
 use yii\data\ActiveDataProvider;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
-use yii\grid\SerialColumn;
+use yii\helpers\Url;
 use yii\web\View;
 
 /* @var $this View */
@@ -30,15 +30,14 @@ print GridView::widget([
     'dataProvider' => $dataProvider,
     'columns' => [
         [
-            'class' => SerialColumn::className(),
-        ],
-        'id', 'title',
-        [
-            'attribute' => 'repo_type',
+            'attribute' => 'title',
             'value' => function($data) {
                 /* @var $data Project */
-                return $data->getRepoTypeName();
-            }
+                $title = Html::a(Html::encode($data->title), ['/project/history/simple', 'id' => $data->getPrimaryKey()]);
+                $title .= ' ' . Html::tag('span', strtoupper($data->getRepoTypeName()), ['class' => $data->getRepoLabelCss()]);
+                return $title;
+            },
+            'format' => 'html',
         ],
         [
             'class' => ActionColumn::className(),

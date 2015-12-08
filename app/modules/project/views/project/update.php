@@ -8,7 +8,7 @@ use yii\web\View;
 /* @var $model Project */
 
 print Html::tag('h1', Yii::t('user', 'Update project: {name}', [
-    'name' => $model->title,
+    'name' => Html::encode($model->title),
 ]));
 
 print $this->render('_form', [

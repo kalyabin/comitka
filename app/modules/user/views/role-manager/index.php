@@ -21,9 +21,6 @@ use yii\web\View;
 print GridView::widget([
     'dataProvider' => $dataProvider,
     'columns' => [
-        [
-            'class' => SerialColumn::className(),
-        ],
         'name', 'description',
         [
             'class' => ActionColumn::className(),

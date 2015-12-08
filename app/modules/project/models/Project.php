@@ -179,4 +179,22 @@ class Project extends ActiveRecord
 
         throw new CommonException(Yii::t('project', 'Unknown repo type'));
     }
+
+    /**
+     * @return string repository CSS label class
+     */
+    public function getRepoLabelCss()
+    {
+        $ret = 'label ';
+        if ($this->repo_type == self::REPO_GIT) {
+            $ret .= 'label-warning label-git';
+        }
+        else if ($this->repo_type == self::REPO_HG) {
+            $ret .= 'label-default label-hg';
+        }
+        else if ($this->repo_type == self::REPO_SVN) {
+            $ret = 'label-info label-svn';
+        }
+        return $ret;
+    }
 }

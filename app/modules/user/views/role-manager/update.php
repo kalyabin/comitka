@@ -8,7 +8,7 @@ use yii\web\View;
 /* @var $model RoleForm */
 
 print Html::tag('h1', Yii::t('user', 'Update role: {name}', [
-    'name' => $model->getName(),
+    'name' => Html::encode($model->getName()),
 ]));
 
 print $this->render('_form', [
