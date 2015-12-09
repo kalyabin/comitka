@@ -24,5 +24,6 @@ return [
         '/projects/<id:(\d+)>/<action:(update|delete)>' => '/project/project/<action>',
         '/projects/create' => '/project/project/create',
         '/projects/<id:(\d+)>/history' => '/project/history/simple',
+        '/projects/<id:(\d+)>/graph' => '/project/history/graph',
     ],
 ];
