@@ -71,11 +71,19 @@ class HistoryController extends Controller
             ]));
         }
 
+        // calculate commits count
+        $commitsCount = 0;
+        foreach ($graph as $item) {
+            if ($item->hasCommitPiece()) {
+                $commitsCount++;
+            }
+        }
+
         // list pages
         $pagination = new Pagination([
             'pageSize' => self::PAGE_LIMIT,
-            'totalCount' => count($history) < self::PAGE_LIMIT ?
-                $skip + count($history) :
+            'totalCount' => $commitsCount < self::PAGE_LIMIT ?
+                $skip + $commitsCount :
                 $skip + self::PAGE_LIMIT + 1,
             'defaultPageSize' => self::PAGE_LIMIT,
         ]);
