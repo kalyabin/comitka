@@ -15,5 +15,8 @@
             "bower-asset-library": "vendor/bower"
         }
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "require-dev": {
+        "codeception/codeception": "*"
+    }
 }

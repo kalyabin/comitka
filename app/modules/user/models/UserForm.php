@@ -44,8 +44,9 @@ class UserForm extends User
     {
         return [
             ['sendNotification', 'boolean'],
+            ['roles', 'required'],
             ['roles', 'each', 'rule' => [
-                'in', 'range' => array_keys($this->getRolesList()),
+                'in', 'range' => array_keys($this->getRolesList()), 'skipOnEmpty' => false
             ]],
             ['newPassword', 'string', 'max' => 255, 'on' => 'update'],
             ['newPasswordConfirmation', 'string', 'max' => 255, 'on' => 'update'],
