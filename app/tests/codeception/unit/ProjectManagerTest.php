@@ -141,5 +141,18 @@ class ProjectManagerTest extends Test
             }
         }
         $this->assertEquals($commitCnt, 10);
+        return $repository;
+    }
+
+    /**
+     * Tests remove project
+     *
+     * @depends testUpdateProject
+     * @param Project $model
+     */
+    public function testRemoveProject(Project $model)
+    {
+        $result = $model->delete();
+        $this->assertEquals(1, $result);
     }
 }

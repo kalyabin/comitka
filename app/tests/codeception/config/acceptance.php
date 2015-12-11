@@ -6,7 +6,7 @@
 
 use yii\helpers\ArrayHelper;
 
-return ArrayHelper::merge(include YII_APP_BASE_PATH . '/config/common.php', [
+return ArrayHelper::merge(include __DIR__ . '/common.php', [
     'id' => 'acceptance-test',
 
 ], include __DIR__ . '/acceptance.local.php');
