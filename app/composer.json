@@ -17,6 +17,7 @@
     },
     "minimum-stability": "dev",
     "require-dev": {
-        "codeception/codeception": "*"
+        "codeception/codeception": "*",
+        "phpunit/phpunit": "*"
     }
 }

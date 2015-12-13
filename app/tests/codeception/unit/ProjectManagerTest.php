@@ -133,14 +133,9 @@ class ProjectManagerTest extends Test
     public function testGetRepositoryGraphHistory(Repository $repository)
     {
         $graph = $repository->getGraphHistory(10, 2);
-        $commitCnt = 0;
-        $this->assertContainsOnly(Graph::className(), $graph);
-        foreach ($graph as $item) {
-            if ($item->hasCommitPiece()) {
-                $commitCnt++;
-            }
-        }
-        $this->assertEquals($commitCnt, 10);
+        $this->assertInstanceOf(Graph::className(), $graph);
+        $this->assertCount(10, $graph->getCommits());
+        $this->assertContainsOnly(Commit::className(), $graph->getCommits());
         return $repository;
     }
 

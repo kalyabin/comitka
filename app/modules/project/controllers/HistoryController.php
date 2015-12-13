@@ -5,9 +5,10 @@ use app\components\Alert;
 use app\components\AuthControl;
 use project\models\Project;
 use VcsCommon\BaseBranch;
+use VcsCommon\BaseCommit;
 use VcsCommon\exception\CommonException;
+use VcsCommon\Graph;
 use Yii;
-use yii\data\ArrayDataProvider;
 use yii\data\Pagination;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
@@ -22,6 +23,16 @@ class HistoryController extends Controller
      * Commits per page
      */
     const PAGE_LIMIT = 100;
+
+    /**
+     * Graph history type
+     */
+    const TYPE_GRAPH = 'graph';
+
+    /**
+     * Simple history type
+     */
+    const TYPE_SIMPLE = 'simple';
 
     /**
      * @inheritdoc
@@ -42,69 +53,17 @@ class HistoryController extends Controller
     }
 
     /**
-     * Graph project history
+     * View project history: graph history or simple
      *
+     * @param string $type history type: graph or simple, throws 404 if else
      * @param integer $id project identifier
      * @param integer $page page number
+     * @throws NotFoundHttpException
      */
-    public function actionGraph($id, $page = 1)
+    public function actionHistory($type, $id, $page = 1)
     {
         $project = $this->findModel($id);
-        $skip = $this->calculateSkip($page);
 
-        // graph list
-        $graph = [];
-
-        // branches list with head commits
-        /* @var $branches BaseBranch[] */
-        $branches = [];
-
-        try {
-            $repository = $project->getRepositoryObject();
-            $graph = $repository->getGraphHistory(self::PAGE_LIMIT, $skip);
-            $branches = $repository->getBranches();
-        } catch (CommonException $ex) {
-            /* @var $systemAlert Alert */
-            $systemAlert = Yii::$app->systemAlert;
-            $systemAlert->setMessage(Alert::DANGER, Yii::t('app', 'System error: {message}', [
-                'message' => $ex->getMessage(),
-            ]));
-        }
-
-        // calculate commits count
-        $commitsCount = 0;
-        foreach ($graph as $item) {
-            if ($item->hasCommitPiece()) {
-                $commitsCount++;
-            }
-        }
-
-        // list pages
-        $pagination = new Pagination([
-            'pageSize' => self::PAGE_LIMIT,
-            'totalCount' => $commitsCount < self::PAGE_LIMIT ?
-                $skip + $commitsCount :
-                $skip + self::PAGE_LIMIT + 1,
-            'defaultPageSize' => self::PAGE_LIMIT,
-        ]);
-
-        return $this->render('graph', [
-            'project' => $project,
-            'pagination' => $pagination,
-            'graph' => $graph,
-            'branches' => $branches,
-        ]);
-    }
-
-    /**
-     * Simple project history
-     *
-     * @param integer $id project identifier
-     * @param integer $page page number
-     */
-    public function actionSimple($id, $page = 1)
-    {
-        $project = $this->findModel($id);
         $skip = $this->calculateSkip($page);
 
         // commits list
@@ -117,7 +76,17 @@ class HistoryController extends Controller
 
         try {
             $repository = $project->getRepositoryObject();
-            $history = $repository->getHistory(self::PAGE_LIMIT, $skip);
+            if ($type == self::TYPE_SIMPLE) {
+                $history = $repository->getHistory(self::PAGE_LIMIT, $skip);
+            }
+            else if ($type == self::TYPE_GRAPH) {
+                $graph = $repository->getGraphHistory(self::PAGE_LIMIT, $skip);
+                $history = $graph->getCommits();
+            }
+            else {
+                throw new NotFoundHttpException();
+            }
+
             $branches = $repository->getBranches();
         } catch (CommonException $ex) {
             /* @var $systemAlert Alert */
@@ -136,7 +105,7 @@ class HistoryController extends Controller
             'defaultPageSize' => self::PAGE_LIMIT,
         ]);
 
-        return $this->render('simple', [
+        return $this->render($type, [
             'project' => $project,
             'pagination' => $pagination,
             'history' => $history,

@@ -22,11 +22,11 @@ use yii\widgets\LinkPager;
 <div class="list-group">
     <?php foreach ($history as $commit):?>
         <?php /* @var $commit BaseCommit */ ?>
-        <a class="list-group-item col-md-12" href="<?=Url::to(['commit', 'id' => $commit->getId()])?>">
+        <a class="list-group-item col-md-12 history-simple-item" href="<?=Url::to(['commit', 'id' => $commit->getId()])?>">
             <div class="col-md-2">
                 <span class="commit-date"><?=$commit->getDate()->format('d\'M y H:i:s')?></span>
             </div>
-            <div class="col-md-7">
+            <div class="col-md-7 commit-message">
                 <strong class="list-group-item-heading"><?=Html::encode($commit->message)?></strong>
             </div>
             <div class="col-md-3">

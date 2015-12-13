@@ -21,3 +21,9 @@ body {
     display: inline-block;
     vertical-align: baseline;
 }
+
+.history-simple-item .commit-message {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
