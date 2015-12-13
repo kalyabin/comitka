@@ -131,7 +131,7 @@ class UserManagerTest extends Test
      *
      * @depends testUpdateUser
      */
-    public function testLoclUser(User $user)
+    public function testLockingUser(User $user)
     {
         $result = self::$userModule->lockUser($user);
         $this->assertTrue($result);
