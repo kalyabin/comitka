@@ -33,7 +33,7 @@ print GridView::widget([
             'attribute' => 'title',
             'value' => function($data) {
                 /* @var $data Project */
-                $title = Html::a(Html::encode($data->title), ['/project/history/simple', 'id' => $data->getPrimaryKey()]);
+                $title = Html::a(Html::encode($data->title), ['/project/history/history', 'id' => $data->getPrimaryKey(), 'type' => 'simple']);
                 $title .= ' ' . Html::tag('span', strtoupper($data->getRepoTypeName()), ['class' => $data->getRepoLabelCss()]);
                 return $title;
             },
