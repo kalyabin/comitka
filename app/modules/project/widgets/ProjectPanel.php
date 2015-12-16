@@ -38,11 +38,11 @@ class ProjectPanel extends Widget
         $this->links = [
             [
                 'label' => Yii::t('project', 'History'),
-                'url' => ['/project/history/history', 'id' => $this->project->id, 'type' => 'simple'],
+                'url' => ['/project/history/log', 'id' => $this->project->id, 'type' => 'simple'],
             ],
             [
                 'label' => Yii::t('project', 'Graph'),
-                'url' => ['/project/history/history', 'id' => $this->project->id, 'type' => 'graph'],
+                'url' => ['/project/history/log', 'id' => $this->project->id, 'type' => 'graph'],
             ]
         ];
     }

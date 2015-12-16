@@ -1,39 +1,22 @@
 <?php
 namespace project\controllers;
 
-use app\components\Alert;
 use app\components\AuthControl;
+use project\controllers\actions\CommitSummaryAction;
+use project\controllers\actions\LogAction;
 use project\models\Project;
-use VcsCommon\BaseBranch;
-use VcsCommon\BaseCommit;
 use VcsCommon\exception\CommonException;
-use VcsCommon\Graph;
 use Yii;
-use yii\data\Pagination;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\ServerErrorHttpException;
 
 /**
  * View projects history using simple view or graph view
  */
 class HistoryController extends Controller
 {
-    /**
-     * Commits per page
-     */
-    const PAGE_LIMIT = 100;
-
-    /**
-     * Graph history type
-     */
-    const TYPE_GRAPH = 'graph';
-
-    /**
-     * Simple history type
-     */
-    const TYPE_SIMPLE = 'simple';
-
     /**
      * @inheritdoc
      */
@@ -53,81 +36,47 @@ class HistoryController extends Controller
     }
 
     /**
-     * View project history: graph history or simple
+     * Get basic variables as project model and declare standalone actions.
+     * If project not found - generate 404.
      *
-     * @param string $type history type: graph or simple, throws 404 if else
-     * @param integer $id project identifier
-     * @param integer $page page number
      * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
      */
-    public function actionHistory($type, $id, $page = 1)
+    public function actions()
     {
-        $project = $this->findModel($id);
-
-        $skip = $this->calculateSkip($page);
-
-        // commits list
-        /* @var $history BaseCommit[] */
-        $history = [];
-
-        // branches list with head commits
-        /* @var $branches BaseBranch[] */
-        $branches = [];
+        $projectId = Yii::$app->request->get('id');
+        $project = $this->findModel($projectId);
+        $repository = null;
 
         try {
             $repository = $project->getRepositoryObject();
-            if ($type == self::TYPE_SIMPLE) {
-                $history = $repository->getHistory(self::PAGE_LIMIT, $skip);
-            }
-            else if ($type == self::TYPE_GRAPH) {
-                $graph = $repository->getGraphHistory(self::PAGE_LIMIT, $skip);
-                $history = $graph->getCommits();
-            }
-            else {
-                throw new NotFoundHttpException();
-            }
-
-            $branches = $repository->getBranches();
-        } catch (CommonException $ex) {
-            /* @var $systemAlert Alert */
-            $systemAlert = Yii::$app->systemAlert;
-            $systemAlert->setMessage(Alert::DANGER, Yii::t('app', 'System error: {message}', [
+        }
+        catch (CommonException $ex) {
+            throw new ServerErrorHttpException(Yii::t('app', 'System error: {message}', [
                 'message' => $ex->getMessage(),
             ]));
         }
 
-        // list pages
-        $pagination = new Pagination([
-            'pageSize' => self::PAGE_LIMIT,
-            'totalCount' => count($history) < self::PAGE_LIMIT ?
-                $skip + count($history) :
-                $skip + self::PAGE_LIMIT + 1,
-            'defaultPageSize' => self::PAGE_LIMIT,
-        ]);
-
-        return $this->render($type, [
-            'project' => $project,
-            'pagination' => $pagination,
-            'history' => $history,
-            'branches' => $branches,
-        ]);
+        return [
+            'log' => [
+                'class' => LogAction::className(),
+                'project' => $project,
+                'repository' => $repository,
+                'type' => Yii::$app->request->get('type'),
+            ],
+            'commit-summary' => [
+                'class' => CommitSummaryAction::className(),
+                'project' => $project,
+                'repository' => $repository,
+                'commitId' => Yii::$app->request->get('commitId'),
+            ],
+        ];
     }
 
     /**
-     * Calculate amount of skipped commits using page num.
+     * Find project model by identifier.
      *
-     * @param integer $page page number
-     * @return integer skipped commits
-     */
-    protected function calculateSkip($page)
-    {
-        $page = is_scalar($page) ? max(1, (int) $page) : 1;
-        $skipPages = max(0, $page - 1);
-        return $skipPages * self::PAGE_LIMIT;
-    }
-
-    /**
-     * Find project model
+     * Throws 404 if not found.
      *
      * @param integer $id
      * @return Project

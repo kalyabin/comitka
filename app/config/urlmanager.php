@@ -23,6 +23,7 @@ return [
         '/projects' => '/project/project/index',
         '/projects/<id:(\d+)>/<action:(update|delete)>' => '/project/project/<action>',
         '/projects/create' => '/project/project/create',
-        '/projects/<id:(\d+)>/<type:(graph|simple)>' => '/project/history/history',
+        '/projects/<id:(\d+)>/<type:(graph|simple)>' => '/project/history/log',
+        '/projects/<id:(\d+)>/rev/<commitId:([a-f0-9]+)>' => '/project/history/commit-summary',
     ],
 ];
