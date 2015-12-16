@@ -136,7 +136,6 @@ class ProjectManagerTest extends Test
         $this->assertInstanceOf(Graph::className(), $graph);
         $this->assertCount(10, $graph->getCommits());
         $this->assertContainsOnly(Commit::className(), $graph->getCommits());
-        return $repository;
     }
 
     /**

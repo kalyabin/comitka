@@ -30,3 +30,17 @@ use yii\web\View;
 </p>
 
 <h5><?=Yii::t('project', 'Changed files')?>:</h5>
+
+<?php foreach ($commit->getChangedFiles() as $item):?>
+    <?php
+    $itemClassSuffix = 'default';
+    if ($item['status'] == 'R' || $item['status'] == 'D') {
+        $itemClassSuffix = 'danger';
+    }
+    else if ($item['status'] == 'A') {
+        $itemClassSuffix = 'success';
+    }
+    ?>
+    <?=Html::tag('span', $item['status'], ['class' => 'label label-' . $itemClassSuffix]) . '&nbsp;&nbsp;&nbsp;' . $item['path']->getPathname()?>
+    <br />
+<?php endforeach; ?>
