@@ -7,7 +7,8 @@
         "yiisoft/yii2-debug": "*",
         "yiisoft/yii2-gii": "*",
         "yiisoft/yii2-faker": "*",
-        "kalyabin/yii2-git-view": "dev-master"
+        "kalyabin/yii2-git-view": "dev-master",
+        "codemirror/CodeMirror": "^5.12"
     },
     "extra": {
         "asset-installer-paths": {
@@ -19,5 +20,19 @@
     "require-dev": {
         "codeception/codeception": "*",
         "phpunit/phpunit": "*"
-    }
+    },
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "codemirror/CodeMirror",
+                "version": "5.12.0",
+                "source": {
+                    "url": "git://github.com/codemirror/CodeMirror.git",
+                    "type": "git",
+                    "reference": "5.12.0"
+                }
+            }
+        }
+    ]
 }

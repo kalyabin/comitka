@@ -24,6 +24,7 @@ return [
         '/projects/<id:(\d+)>/<action:(update|delete)>' => '/project/project/<action>',
         '/projects/create' => '/project/project/create',
         '/projects/<id:(\d+)>/<type:(graph|simple)>' => '/project/history/log',
-        '/projects/<id:(\d+)>/rev/<commitId:([a-f0-9]+)>' => '/project/history/commit-summary',
+        '/projects/<id:(\d+)>/rev/<commitId:([a-f0-9]+)>/summary' => '/project/history/commit-summary',
+        '/projects/<id:(\d+)>/rev/<commitId:([a-f0-9]+)>/details' => '/project/history/file-view',
     ],
 ];

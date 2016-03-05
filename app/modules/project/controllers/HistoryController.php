@@ -3,6 +3,7 @@ namespace project\controllers;
 
 use app\components\AuthControl;
 use project\controllers\actions\CommitSummaryAction;
+use project\controllers\actions\FileViewAction;
 use project\controllers\actions\LogAction;
 use project\models\Project;
 use VcsCommon\exception\CommonException;
@@ -69,6 +70,14 @@ class HistoryController extends Controller
                 'project' => $project,
                 'repository' => $repository,
                 'commitId' => Yii::$app->request->get('commitId'),
+            ],
+            'file-view' => [
+                'class' => FileViewAction::className(),
+                'project' => $project,
+                'repository' => $repository,
+                'commitId' => Yii::$app->request->get('commitId'),
+                'filePath' => Yii::$app->request->get('filePath'),
+                'mode' => Yii::$app->request->get('mode'),
             ],
         ];
     }
