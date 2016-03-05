@@ -93,7 +93,9 @@ use yii\web\View;
 
 <?php
 // modal window for view file details
-$modal = Modal::begin();
+$modal = Modal::begin([
+    'size' => Modal::SIZE_LARGE,
+]);
 Modal::end();
 
 // JavaScript page options

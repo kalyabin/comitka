@@ -21,7 +21,8 @@
                     'data'      : yii.getCsrfParam() + '=' + yii.getCsrfToken() + '&' + pageParams,
                     'success'   : function(response) {
                         if (response.html) {
-                            alert(response.html);
+                            $fileModal.find('.modal-body').html(response.html);
+                            $fileModal.modal('show');
                         }
                     }
                 });

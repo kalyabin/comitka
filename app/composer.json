@@ -8,7 +8,7 @@
         "yiisoft/yii2-gii": "*",
         "yiisoft/yii2-faker": "*",
         "kalyabin/yii2-git-view": "dev-master",
-        "codemirror/CodeMirror": "^5.12"
+        "isagalaev/highlight.js": "^9.2"
     },
     "extra": {
         "asset-installer-paths": {
@@ -25,12 +25,12 @@
         {
             "type": "package",
             "package": {
-                "name": "codemirror/CodeMirror",
-                "version": "5.12.0",
+                "name": "isagalaev/highlight.js",
+                "version": "9.2.0",
                 "source": {
-                    "url": "git://github.com/codemirror/CodeMirror.git",
+                    "url": "https://github.com/isagalaev/highlight.js",
                     "type": "git",
-                    "reference": "5.12.0"
+                    "reference": "9.2.0"
                 }
             }
         }

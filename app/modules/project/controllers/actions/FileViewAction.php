@@ -93,7 +93,7 @@ class FileViewAction extends Action
         /* @var $commit BaseCommit */
         $commit = null;
 
-        /* @var $fileDiff BaseDiff */
+        /* @var $fileDiff BaseDiff[] */
         $fileDiff = null;
         /* @var $raw string */
         $raw = null;
@@ -108,9 +108,6 @@ class FileViewAction extends Action
                  * @todo Get raw file
                  */
             }
-            else {
-                throw new NotFoundHttpException(Yii::t('project', 'Undefined view mode'));
-            }
         }
         catch (CommonException $ex) {
             throw new NotFoundHttpException(Yii::t('app', 'System error: {message}', [
@@ -118,10 +115,12 @@ class FileViewAction extends Action
             ]), $ex->getCode(), $ex);
         }
 
+        $viewFile = $this->mode === self::MODE_DIFF ? 'file_diff' : 'file_raw';
+
         return [
-            'html' => $this->controller->render('commit/file', [
+            'html' => $this->controller->renderAjax('commit/' . $viewFile, [
                 'commit' => $commit,
-                'diff' => $fileDiff,
+                'diffs' => $fileDiff,
                 'path' => $this->filePath,
             ]),
         ];
