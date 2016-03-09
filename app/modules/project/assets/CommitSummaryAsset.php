@@ -18,7 +18,6 @@ class CommitSummaryAsset extends AssetBundle
     ];
     public $depends = [
         'app\assets\CommonAsset',
-        'app\assets\HighlightJsAsset',
     ];
 
     /**

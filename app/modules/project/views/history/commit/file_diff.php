@@ -11,49 +11,57 @@ use yii\web\View;
 /* @var $path string */
 /* @var $commit BaseCommit */
 
+$contributor = $commit->contributorName;
+if ($commit->contributorEmail) {
+    $contributor .= ' <' . $commit->contributorEmail . '>';
+}
 $id = md5($commit->getId() . $path);
 ?>
 
-<table id="<?= $id ?>">
-    <?php foreach ($diffs as $diff):?>
-        <?php foreach ($diff->getLines() as $description => $group):?>
-            <?php
-            $aNum = (int) $group['beginA'];
-            $bNum = (int) $group['beginB'];
-            ?>
-            <tr>
-                <td colspan="4"><?= Html::encode($description) ?></td>
-            </tr>
-            <?php foreach ($group['lines'] as $line):?>
+<p class="diff-description">
+    <strong><?= Yii::t('project', 'Author') ?>:</strong> <?= Html::encode($contributor) ?><br />
+</p>
+
+<div id="<?= $id ?>" class="diff-inner">
+    <table id="<?= $id ?>" class="diff-table">
+        <?php foreach ($diffs as $diff):?>
+            <?php foreach ($diff->getLines() as $description => $group):?>
                 <?php
-                $a = StringHelper::startsWith($line, '-') || StringHelper::startsWith($line, ' ') || strlen($line) === 0 ? $aNum : null;
-                $b = StringHelper::startsWith($line, '+') || StringHelper::startsWith($line, ' ') || strlen($line) === 0 ? $bNum : null;
-
-                $line = str_replace(' ', '&nbsp;', Html::encode(substr($line, 1)));
-
-                /**
-                 * @todo fix highlighting and do something with tabs
-                 */
+                $aNum = (int) $group['beginA'];
+                $bNum = (int) $group['beginB'];
                 ?>
                 <tr>
-                    <td width="10"><?= $a ?></td>
-                    <td><code class="php"><?= is_null($a) ? '' : $line ?></code></td>
-                    <td width="10"><?= $b ?></td>
-                    <td><code class="php"><?= is_null($b) ? '' : $line ?></code></td>
+                    <td colspan="3" class="cell-description"><?= Html::encode($description) ?></td>
                 </tr>
-                <?php
-                $aNum += is_null($a) ? 0 : 1;
-                $bNum += is_null($b) ? 0 : 1;
-                ?>
+                <?php foreach ($group['lines'] as $n => $line):?>
+                    <?php
+                    $type = StringHelper::startsWith($line, '-') ? 'del' : (StringHelper::startsWith($line, '+') ? 'new' : 'old');
+                    $line = Html::encode(substr($line, 1));
+                    $line = str_replace(
+                        [
+                            " ",
+                            "\t"
+                        ],
+                        [
+                            '&nbsp;',
+                            '&thinsp;',
+                        ],
+                        $line
+                    );
+                    $a = $type === 'del' || $type === 'old' ? $aNum : null;
+                    $b = $type === 'new' || $type === 'old' ? $bNum : null;
+                    ?>
+                    <tr class="row-<?= $type ?><?php if ($n === count($group['lines']) - 1):?> last-line<?php endif;?>">
+                        <td width="10" class="cell-a-num"><?= $a ? $a : '+' ?></td>
+                        <td width="10" class="cell-b-num"><?= $b ? $b : '-' ?></td>
+                        <td class="cell-content"><?= $line ?></td>
+                    </tr>
+                    <?php
+                    $aNum += is_null($a) ? 0 : 1;
+                    $bNum += is_null($b) ? 0 : 1;
+                    ?>
+                <?php endforeach;?>
             <?php endforeach;?>
         <?php endforeach;?>
-    <?php endforeach;?>
-</table>
-
-<script type="text/javascript">
-    $(document).ready(function() {
-        $('#<?= $id ?> code').each(function(i, block) {
-            hljs.highlightBlock(block);
-        });
-    });
-</script>
+    </table>
+</div>

@@ -27,6 +27,8 @@ use yii\web\View;
         <?=Html::encode('<' . $commit->contributorEmail . '>')?>
     <?php endif;?>
     <br />
+    <strong><?= Yii::t('project', 'Date') ?>:</strong>
+    <?= Html::encode($commit->getDate()->format("d\'M y H:i:s")) ?><br />
     <strong><?=Yii::t('project', 'Revision')?>:</strong>
     <?=Html::encode($commit->getId())?><br />
     <strong><?=Yii::t('project', 'Parent revision')?>:</strong>
@@ -94,6 +96,7 @@ use yii\web\View;
 <?php
 // modal window for view file details
 $modal = Modal::begin([
+    'header' => '<div class="js-revision-title"></div>',
     'size' => Modal::SIZE_LARGE,
 ]);
 Modal::end();

@@ -14,13 +14,15 @@
             var fileDetailsUrl = options.fileDetailsUrl;
 
             var openFileViewModal = function(pageParams) {
+                pageParams = pageParams.replace(/^#(.*)/g, '$1');
                 $.ajax({
                     'dataType'  : 'json',
                     'type'      : 'get',
                     'url'       : fileDetailsUrl,
                     'data'      : yii.getCsrfParam() + '=' + yii.getCsrfToken() + '&' + pageParams,
                     'success'   : function(response) {
-                        if (response.html) {
+                        if (response.html && response.diff) {
+                            $fileModal.find('.js-revision-title').html(response.diff);
                             $fileModal.find('.modal-body').html(response.html);
                             $fileModal.modal('show');
                         }
@@ -32,9 +34,15 @@
              * Open a file view modal
              */
             $(options.fileLinkSelector).click(function(e) {
-                var pageParams = $(this).attr('href').replace(/^#(.*)/g, '$1');
-                openFileViewModal(pageParams);
+                openFileViewModal($(this).attr('href'));
             });
+
+            /**
+             * Bootstrap hash
+             */
+            if (location.hash) {
+                openFileViewModal(location.hash);
+            }
         });
 
         return this;

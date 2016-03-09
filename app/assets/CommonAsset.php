@@ -8,7 +8,7 @@ use yii\web\AssetBundle;
  */
 class CommonAsset extends AssetBundle
 {
-    public $sourcePath = '@app/static';
+    public $sourcePath = '@app/assets/static';
     public $css = [
         'css/bootstrap-theme.min.css',
         'css/theme.css',

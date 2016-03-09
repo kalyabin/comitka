@@ -7,8 +7,7 @@
         "yiisoft/yii2-debug": "*",
         "yiisoft/yii2-gii": "*",
         "yiisoft/yii2-faker": "*",
-        "kalyabin/yii2-git-view": "dev-master",
-        "isagalaev/highlight.js": "^9.2"
+        "kalyabin/yii2-git-view": "dev-master"
     },
     "extra": {
         "asset-installer-paths": {

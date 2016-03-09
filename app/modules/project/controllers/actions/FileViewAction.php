@@ -118,6 +118,7 @@ class FileViewAction extends Action
         $viewFile = $this->mode === self::MODE_DIFF ? 'file_diff' : 'file_raw';
 
         return [
+            'diff' => Yii::t('project', 'Revision') . ': ' .$commit->getId(),
             'html' => $this->controller->renderAjax('commit/' . $viewFile, [
                 'commit' => $commit,
                 'diffs' => $fileDiff,
