@@ -22,10 +22,10 @@ use yii\web\View;
 
 <p>
     <strong><?=Yii::t('project', 'Author')?>:</strong>
-    <?=Html::encode($commit->contributorName)?>
-    <?php if ($commit->contributorEmail):?>
-        <?=Html::encode('<' . $commit->contributorEmail . '>')?>
-    <?php endif;?>
+    <?= user\widgets\ContributorLine::widget([
+        'contributorName' => $commit->contributorName,
+        'contributorEmail' => $commit->contributorEmail,
+    ]) ?>
     <br />
     <strong><?= Yii::t('project', 'Date') ?>:</strong>
     <?= Html::encode($commit->getDate()->format("d\'M y H:i:s")) ?><br />

@@ -95,6 +95,8 @@ class FileViewAction extends Action
 
         /* @var $fileDiff BaseDiff[] */
         $fileDiff = null;
+        /* @var $fileContents string */
+        $fileContents = '';
         /* @var $raw string */
         $raw = null;
 
@@ -102,11 +104,11 @@ class FileViewAction extends Action
             // get commit model by commit identifier
             $commit = $this->repository->getCommit($this->commitId);
 
-            $fileDiff = $commit->getDiff($this->filePath);
-            if ($this->mode === self::MODE_RAW) {
-                /**
-                 * @todo Get raw file
-                 */
+            if ($this->mode === self::MODE_DIFF) {
+                $fileDiff = $commit->getDiff($this->filePath);
+            }
+            elseif ($this->mode === self::MODE_RAW) {
+                $fileContents = $commit->getRawFile($this->filePath);
             }
         }
         catch (CommonException $ex) {
@@ -122,6 +124,7 @@ class FileViewAction extends Action
             'html' => $this->controller->renderAjax('commit/' . $viewFile, [
                 'commit' => $commit,
                 'diffs' => $fileDiff,
+                'fileContents' => $fileContents,
                 'path' => $this->filePath,
             ]),
         ];
