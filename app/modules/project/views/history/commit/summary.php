@@ -1,9 +1,9 @@
 <?php
 
 use project\assets\CommitSummaryAsset;
-use project\controllers\actions\FileViewAction;
 use project\models\Project;
 use project\widgets\ProjectPanel;
+use project\widgets\RevisionFile;
 use VcsCommon\BaseCommit;
 use VcsCommon\BaseRepository;
 use yii\bootstrap\Html;
@@ -46,60 +46,14 @@ use yii\web\View;
 
 <h5><?=Yii::t('project', 'Changed files')?>:</h5>
 
-<?php foreach ($commit->getChangedFiles() as $item):?>
-    <?php
-    $itemClassSuffix = 'default';
-    $links = [
-        [
-            'hash' => http_build_query([
-                'commitId' => $commit->getId(),
-                'filePath' => $item['path']->getPathname(),
-                'mode' => FileViewAction::MODE_RAW,
-            ]),
-            'label' => '[' . Yii::t('project', 'raw') . ']',
-        ],
-    ];
-    if ($item['status'] == 'R' || $item['status'] == 'D') {
-        $itemClassSuffix = 'danger';
-    }
-    elseif ($item['status'] === 'A') {
-        $itemClassSuffix = 'success';
-    }
-    elseif ($item['status'] === 'M') {
-        $links[] = [
-            'hash' => http_build_query([
-                'commitId' => $commit->getId(),
-                'filePath' => $item['path']->getPathname(),
-                'mode' => FileViewAction::MODE_DIFF,
-            ]),
-            'label' => '[' . Yii::t('project', 'diff') . ']',
-        ];
-    }
-    print Html::tag(
-        'span',
-        $item['status'],
-        [
-            'class' => 'label label-' . $itemClassSuffix
-        ]
-    );
-    print '&nbsp;&nbsp;&nbsp;' . $item['path']->getPathname() . '&nbsp;&nbsp;';
-    print implode('&nbsp;', array_map(function($link) {
-        return Html::tag('a', $link['label'], [
-            'href' => '#' . $link['hash'],
-            'class' => 'js-revision-file',
-        ]);
-    }, $links));
-    ?>
-    <br />
-<?php endforeach; ?>
-
 <?php
-// modal window for view file details
-$modal = Modal::begin([
-    'header' => '<div class="js-revision-title"></div>',
-    'size' => Modal::SIZE_LARGE,
-]);
-Modal::end();
+foreach ($commit->getChangedFiles() as $item):
+    print RevisionFile::widget([
+        'status' => $item['status'],
+        'commit' => $commit,
+        'pathname' => $item['path']->getPathname(),
+    ]);
+endforeach;
 
 // JavaScript page options
 $jsOptions = [
@@ -108,8 +62,9 @@ $jsOptions = [
         'id' => $project->getPrimaryKey(),
         'commitId' => $commit->getId(),
     ]),
-    'fileViewModalId' => $modal->getId(),
+    'fileContentSelector' => '.js-revision-file-content',
     'fileLinkSelector' => '.js-revision-file',
+    'fileLinkActiveClass' => 'active',
 ];
 CommitSummaryAsset::register($this, $jsOptions);
 ?>

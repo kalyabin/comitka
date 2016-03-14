@@ -72,3 +72,9 @@ body {
     max-width: 100%;
     overflow-x: scroll;
 }
+.revision-file-link {
+    font-weight: normal;
+}
+.revision-file-link.active {
+    font-weight: bold;
+}
