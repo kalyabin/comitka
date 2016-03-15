@@ -92,13 +92,10 @@ class FileViewAction extends Action
     {
         /* @var $commit BaseCommit */
         $commit = null;
-
         /* @var $fileDiff BaseDiff[] */
-        $fileDiff = null;
+        $fileDiff = [];
         /* @var $fileContents string */
         $fileContents = '';
-        /* @var $raw string */
-        $raw = null;
 
         try {
             // get commit model by commit identifier
