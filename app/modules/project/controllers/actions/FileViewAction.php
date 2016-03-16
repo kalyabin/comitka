@@ -2,6 +2,7 @@
 
 namespace project\controllers\actions;
 
+use VcsCommon\File;
 use project\models\Project;
 use VcsCommon\BaseCommit;
 use VcsCommon\BaseDiff;
@@ -104,8 +105,14 @@ class FileViewAction extends Action
             if ($this->mode === self::MODE_DIFF) {
                 $fileDiff = $commit->getDiff($this->filePath);
             }
-            elseif ($this->mode === self::MODE_RAW) {
+            elseif (
+                $this->mode === self::MODE_RAW &&
+                $commit->getFileStatus($this->filePath) != File::STATUS_DELETION
+            ) {
                 $fileContents = $commit->getRawFile($this->filePath);
+            }
+            elseif ($this->mode === self::MODE_RAW) {
+                $fileContents = $commit->getPreviousRawFile($this->filePath);
             }
         }
         catch (CommonException $ex) {

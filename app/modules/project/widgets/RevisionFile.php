@@ -3,6 +3,7 @@ namespace project\widgets;
 
 use project\controllers\actions\FileViewAction;
 use VcsCommon\BaseCommit;
+use VcsCommon\File;
 use Yii;
 use yii\base\InvalidParamException;
 use yii\base\Widget;
@@ -14,21 +15,14 @@ use yii\helpers\Html;
 class RevisionFile extends Widget
 {
     /**
-     * Diff status: M, A, R, D, etc.
-     *
-     * @var string
-     */
-    public $status;
-
-    /**
      * @var BaseCommit Commit model
      */
     public $commit;
 
     /**
-     * @var string File path name
+     * @var File File model with status
      */
-    public $pathname;
+    public $file;
 
     /**
      * @inheritdoc
@@ -38,7 +32,10 @@ class RevisionFile extends Widget
         if (!$this->commit instanceof BaseCommit) {
             throw new InvalidParamException('Commit variable must be an instance of ' . BaseCommit::className());
         }
-        $this->id = $this->commit->getId() . md5($this->pathname);
+        if (!$this->file instanceof File) {
+            throw new InvalidParamException('File variable must be an instance of ' . File::className());
+        }
+        $this->id = $this->commit->getId() . md5($this->file->getPathname());
     }
 
     /**
@@ -53,19 +50,22 @@ class RevisionFile extends Widget
                 'mode' => FileViewAction::MODE_RAW,
                 'params' => http_build_query([
                     'commitId' => $this->commit->getId(),
-                    'filePath' => $this->pathname,
+                    'filePath' => $this->file->getPathname(),
                     'mode' => FileViewAction::MODE_RAW,
                 ]),
                 'label' => '[' . Yii::t('project', 'raw') . ']',
             ],
         ];
 
-        if ($this->status === 'M') {
+        if (in_array($this->file->getStatus(), [
+            File::STATUS_MODIFIED, File::STATUS_COPIED,
+            File::STATUS_RENAMING, File::STATUS_TYPED
+        ])) {
             $links[] = [
                 'mode' => FileViewAction::MODE_DIFF,
                 'params' => http_build_query([
                     'commitId' => $this->commit->getId(),
-                    'filePath' => $this->pathname,
+                    'filePath' => $this->file->getPathname(),
                     'mode' => FileViewAction::MODE_DIFF,
                 ]),
                 'label' => '[' . Yii::t('project', 'diff') . ']',
@@ -84,11 +84,19 @@ class RevisionFile extends Widget
     {
         $itemClassSuffix = 'default';
 
-        if ($this->status == 'R' || $this->status == 'D') {
+        $status = $this->file->getStatus();
+
+        if ($status === File::STATUS_DELETION || $status === File::STATUS_UNMERGED) {
             $itemClassSuffix = 'danger';
         }
-        elseif ($this->status === 'A') {
+        elseif ($status === File::STATUS_ADDITION || $status === File::STATUS_COPIED) {
             $itemClassSuffix = 'success';
+        }
+        elseif ($status === File::STATUS_MODIFIED || $status === File::STATUS_RENAMING || $status === File::STATUS_TYPED) {
+            $itemClassSuffix = 'info';
+        }
+        else {
+            $status = File::STATUS_UNKNOWN;
         }
 
         $ret = Html::beginTag('div', [
@@ -96,12 +104,12 @@ class RevisionFile extends Widget
         ]);
         $ret .= Html::tag(
             'span',
-            $this->status,
+            $status,
             [
                 'class' => 'label label-' . $itemClassSuffix
             ]
         );
-        $ret .= '&nbsp;&nbsp;&nbsp;' . $this->pathname . '&nbsp;&nbsp;';
+        $ret .= '&nbsp;&nbsp;&nbsp;' . $this->file->getPathname() . '&nbsp;&nbsp;';
         $ret .= implode('&nbsp;', array_map(function($link) {
             return Html::tag('a', $link['label'], [
                 'href' => '#',

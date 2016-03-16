@@ -4,10 +4,10 @@ use project\assets\CommitSummaryAsset;
 use project\models\Project;
 use project\widgets\ProjectPanel;
 use project\widgets\RevisionFile;
+use user\widgets\ContributorLine;
 use VcsCommon\BaseCommit;
 use VcsCommon\BaseRepository;
 use yii\bootstrap\Html;
-use yii\bootstrap\Modal;
 use yii\helpers\Url;
 use yii\web\View;
 
@@ -22,7 +22,7 @@ use yii\web\View;
 
 <p>
     <strong><?=Yii::t('project', 'Author')?>:</strong>
-    <?= user\widgets\ContributorLine::widget([
+    <?= ContributorLine::widget([
         'contributorName' => $commit->contributorName,
         'contributorEmail' => $commit->contributorEmail,
     ]) ?>
@@ -49,9 +49,8 @@ use yii\web\View;
 <?php
 foreach ($commit->getChangedFiles() as $item):
     print RevisionFile::widget([
-        'status' => $item['status'],
         'commit' => $commit,
-        'pathname' => $item['path']->getPathname(),
+        'file' => $item,
     ]);
 endforeach;
 
