@@ -91,7 +91,10 @@ class RevisionFile extends Widget
             $itemClassSuffix = 'success';
         }
 
-        $ret = Html::tag(
+        $ret = Html::beginTag('div', [
+            'class' => 'revision-file',
+        ]);
+        $ret .= Html::tag(
             'span',
             $this->status,
             [
@@ -110,6 +113,7 @@ class RevisionFile extends Widget
                 ],
             ]);
         }, $this->getLinks()));
+        $ret .= Html::endTag('div');
 
         return $ret;
     }
