@@ -2,18 +2,19 @@
 
 namespace project\controllers\actions;
 
-use VcsCommon\File;
 use project\models\Project;
 use VcsCommon\BaseCommit;
 use VcsCommon\BaseDiff;
 use VcsCommon\BaseRepository;
 use VcsCommon\exception\CommonException;
+use VcsCommon\File;
 use Yii;
 use yii\base\Action;
 use yii\base\InvalidParamException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
+use yii\web\ServerErrorHttpException;
 
 /**
  * View file diffs (or raw file) by specific commit id in modal window.
@@ -22,14 +23,19 @@ use yii\web\Response;
 class FileViewAction extends Action
 {
     /**
-     * Diff type
+     * Mode view diff
      */
     const MODE_DIFF = 'diff';
 
     /**
-     * Raw type
+     * Mode view raw
      */
     const MODE_RAW = 'raw';
+
+    /**
+     * Mode view compare
+     */
+    const MODE_COMPARE = 'compare';
 
     /**
      * @var Project project model
@@ -102,26 +108,46 @@ class FileViewAction extends Action
             // get commit model by commit identifier
             $commit = $this->repository->getCommit($this->commitId);
 
-            if ($this->mode === self::MODE_DIFF) {
+            if (
+                $this->mode === self::MODE_DIFF ||
+                ($this->mode === self::MODE_COMPARE && $commit->getFileStatus($this->filePath) === File::STATUS_MODIFIED)
+            ) {
+                // get file diff if diff or compare mode
                 $fileDiff = $commit->getDiff($this->filePath);
             }
             elseif (
                 $this->mode === self::MODE_RAW &&
                 $commit->getFileStatus($this->filePath) != File::STATUS_DELETION
             ) {
+                // modified file
                 $fileContents = $commit->getRawFile($this->filePath);
             }
             elseif ($this->mode === self::MODE_RAW) {
+                // moved file
                 $fileContents = $commit->getPreviousRawFile($this->filePath);
             }
         }
         catch (CommonException $ex) {
-            throw new NotFoundHttpException(Yii::t('app', 'System error: {message}', [
+            throw new ServerErrorHttpException(Yii::t('app', 'System error: {message}', [
                 'message' => $ex->getMessage(),
             ]), $ex->getCode(), $ex);
         }
 
-        $viewFile = $this->mode === self::MODE_DIFF ? 'file_diff' : 'file_raw';
+        $viewFile = null;
+
+        switch ($this->mode) {
+            case self::MODE_DIFF:
+                $viewFile = 'file_diff';
+                break;
+            case self::MODE_COMPARE:
+                $viewFile = 'file_compare';
+                break;
+            case self::MODE_RAW:
+                $viewFile = 'file_raw';
+                break;
+            default:
+                throw new NotFoundHttpException();
+        }
 
         return [
             'diff' => Yii::t('project', 'Revision') . ': ' .$commit->getId(),

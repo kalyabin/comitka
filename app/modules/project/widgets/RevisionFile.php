@@ -45,14 +45,15 @@ class RevisionFile extends Widget
      */
     protected function getLinks()
     {
+        $commonFileLinkParams = http_build_query([
+            'commitId' => $this->commit->getId(),
+            'filePath' => $this->file->getPathname(),
+        ]);
+
         $links = [
             [
                 'mode' => FileViewAction::MODE_RAW,
-                'params' => http_build_query([
-                    'commitId' => $this->commit->getId(),
-                    'filePath' => $this->file->getPathname(),
-                    'mode' => FileViewAction::MODE_RAW,
-                ]),
+                'params' => $commonFileLinkParams,
                 'label' => '[' . Yii::t('project', 'raw') . ']',
             ],
         ];
@@ -63,12 +64,16 @@ class RevisionFile extends Widget
         ])) {
             $links[] = [
                 'mode' => FileViewAction::MODE_DIFF,
-                'params' => http_build_query([
-                    'commitId' => $this->commit->getId(),
-                    'filePath' => $this->file->getPathname(),
-                    'mode' => FileViewAction::MODE_DIFF,
-                ]),
+                'params' => $commonFileLinkParams,
                 'label' => '[' . Yii::t('project', 'diff') . ']',
+            ];
+        }
+
+        if ($this->file->getStatus() === File::STATUS_MODIFIED) {
+            $links[] = [
+                'mode' => FileViewAction::MODE_COMPARE,
+                'params' => $commonFileLinkParams,
+                'label' => '[' . Yii::t('project', 'compare') . ']',
             ];
         }
 
@@ -115,7 +120,7 @@ class RevisionFile extends Widget
                 'href' => '#',
                 'class' => 'js-revision-file revision-file-link',
                 'data' => [
-                    'params' => $link['params'],
+                    'params' => $link['params'] . '&mode=' . $link['mode'],
                     'container' => $this->getId(),
                     'mode' => $link['mode'],
                 ],
