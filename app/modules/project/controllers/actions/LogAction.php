@@ -85,31 +85,23 @@ class LogAction extends Action
         /* @var $history BaseCommit[] */
         $history = [];
 
+        // view simple log
+        if ($this->type == self::TYPE_SIMPLE) {
+            $history = $this->repository->getHistory(self::PAGE_LIMIT, $skip);
+        }
+        // view graph log
+        else if ($this->type == self::TYPE_GRAPH) {
+            $graph = $this->repository->getGraphHistory(self::PAGE_LIMIT, $skip);
+            $history = $graph->getCommits();
+        }
+        // if else - generate 404
+        else {
+            throw new NotFoundHttpException();
+        }
+
         // branches list with head commits
         /* @var $branches BaseBranch[] */
-        $branches = [];
-
-        try {
-            // view simple log
-            if ($this->type == self::TYPE_SIMPLE) {
-                $history = $this->repository->getHistory(self::PAGE_LIMIT, $skip);
-            }
-            // view graph log
-            else if ($this->type == self::TYPE_GRAPH) {
-                $graph = $this->repository->getGraphHistory(self::PAGE_LIMIT, $skip);
-                $history = $graph->getCommits();
-            }
-            // if else - generate 404
-            else {
-                throw new NotFoundHttpException();
-            }
-
-            $branches = $this->repository->getBranches();
-        } catch (CommonException $ex) {
-            throw new ServerErrorHttpException(Yii::t('app', 'System error: {message}', [
-                'message' => $ex->getMessage(),
-            ]), $ex->getCode(), $ex);
-        }
+        $branches = $this->repository->getBranches();
 
         // list pages
         $pagination = new Pagination([

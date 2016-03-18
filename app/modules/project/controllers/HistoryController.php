@@ -47,16 +47,8 @@ class HistoryController extends Controller
     {
         $projectId = Yii::$app->request->get('id');
         $project = $this->findModel($projectId);
-        $repository = null;
 
-        try {
-            $repository = $project->getRepositoryObject();
-        }
-        catch (CommonException $ex) {
-            throw new ServerErrorHttpException(Yii::t('app', 'System error: {message}', [
-                'message' => $ex->getMessage(),
-            ]));
-        }
+        $repository = $project->getRepositoryObject();
 
         return [
             'log' => [
