@@ -11,7 +11,7 @@ use yii\web\View;
  */
 class HistoryGraphAsset extends AssetBundle
 {
-    public $sourcePath = '@app/static/js';
+    public $sourcePath = '@app/assets/static/js';
     public $css = [
     ];
     public $js = [

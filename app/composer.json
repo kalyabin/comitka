@@ -7,7 +7,8 @@
         "yiisoft/yii2-debug": "*",
         "yiisoft/yii2-gii": "*",
         "yiisoft/yii2-faker": "*",
-        "kalyabin/yii2-git-view": "dev-master"
+        "kalyabin/yii2-git-view": "dev-master",
+        "bower-asset/raphael": "^2.1"
     },
     "extra": {
         "asset-installer-paths": {
