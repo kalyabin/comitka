@@ -50,6 +50,10 @@ body {
 .diff-table .cell-a-num, .diff-table .cell-b-num {
     text-align: center;
     border-left: 1px solid #EEE;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 .diff-table .cell-b-num {
     border-right: 2px solid #EEE;
