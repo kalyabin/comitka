@@ -43,6 +43,10 @@ class ProjectPanel extends Widget
             [
                 'label' => Yii::t('project', 'Graph'),
                 'url' => ['/project/history/log', 'id' => $this->project->id, 'type' => 'graph'],
+            ],
+            [
+                'label' => Yii::t('project', 'Files tree'),
+                'url' => ['/project/project/tree', 'id' => $this->project->id],
             ]
         ];
     }

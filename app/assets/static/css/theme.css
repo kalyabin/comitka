@@ -82,3 +82,22 @@ body {
 .revision-file-link.active {
     font-weight: bold;
 }
+
+.project-tree {
+    width: 100%;
+}
+.project-tree .even {
+    background-color: #eee;
+}
+.project-tree tr:hover {
+    background-color: #DDD;
+}
+.project-tree-file-permissions {
+    width: 100px;
+}
+.project-tree-file-size {
+    width: 100px;
+}
+.project-tree-file-links {
+    width: 150px;
+}
