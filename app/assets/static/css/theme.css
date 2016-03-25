@@ -83,14 +83,15 @@ body {
     font-weight: bold;
 }
 
+table.table > tbody > tr:hover {
+    background-color: rgb(221, 221, 221);
+}
+
 .project-tree {
     width: 100%;
 }
 .project-tree .even {
     background-color: #eee;
-}
-.project-tree tr:hover {
-    background-color: #DDD;
 }
 .project-tree-file-permissions {
     width: 100px;

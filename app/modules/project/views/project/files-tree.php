@@ -5,6 +5,7 @@ use project\widgets\ProjectPanel;
 use VcsCommon\BaseRepository;
 use VcsCommon\Directory;
 use VcsCommon\File;
+use VcsCommon\FileLink;
 use yii\helpers\Html;
 use yii\web\View;
 
@@ -32,9 +33,9 @@ use yii\web\View;
     <?php endwhile;?>
 
 </div>
-<table class="project-tree">
-    <?php foreach ($filesList as $k => $file):?>
-    <tr<?php if ($k % 2 == 0):?> class="even"<?php endif;?>>
+<table class="project-tree table table-striped table-bordered">
+    <?php foreach ($filesList as $file):?>
+    <tr>
         <td class="project-tree-file-permissions"><?= $file->getPermissions() ?></td>
         <td class="project-tree-file-size"><?= $file->getSize() ?></td>
         <td class="project-tree-file-path">
@@ -55,7 +56,7 @@ use yii\web\View;
                     'id' => $project->id,
                     'subDir' => $file->getRelativePath(),
                 ]) ?>
-            <?php else:?>
+            <?php elseif (!$file instanceof FileLink):?>
                 <?= Html::a('[raw]', [
                     '/project/project/raw',
                     'id' => $project->id,
@@ -63,11 +64,13 @@ use yii\web\View;
                 ]) ?>
             <?php endif;?>
 
-            <?= Html::a('[history]', [
-                '/project/history/path-history',
-                'id' => $project->id,
-                'path' => $file->getRelativePath(),
-            ]) ?>
+            <?php if ($repository->pathIsNotIgnored($file->getRelativePath())):?>
+                <?= Html::a('[history]', [
+                    '/project/history/path-history',
+                    'id' => $project->id,
+                    'path' => $file->getRelativePath(),
+                ]) ?>
+            <?php endif;?>
         </td>
     </tr>
     <?php endforeach;?>

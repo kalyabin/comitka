@@ -1,11 +1,10 @@
 <?php
 
 use project\models\Project;
-use yii\bootstrap\Html;
 use yii\data\ActiveDataProvider;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
-use yii\helpers\Url;
+use yii\helpers\Html;
 use yii\web\View;
 
 /* @var $this View */
@@ -28,6 +27,7 @@ if (Yii::$app->user->can('deleteProject')) {
 }
 print GridView::widget([
     'dataProvider' => $dataProvider,
+    'showHeader' => false,
     'columns' => [
         [
             'attribute' => 'title',
@@ -40,8 +40,32 @@ print GridView::widget([
             'format' => 'html',
         ],
         [
+            'value' => function($data) {
+                /* @var $data Project */
+                $links = [];
+                $links[] = Html::a('[history]', [
+                    '/project/history/log',
+                    'id' => $data->id,
+                    'type' => 'simple'
+                ]);
+                $links[] = Html::a('[graph]', [
+                    '/project/history/log',
+                    'id' => $data->id,
+                    'type' => 'graph',
+                ]);
+                $links[] = Html::a('[tree]', [
+                    '/project/project/tree',
+                    'id' => $data->id,
+                ]);
+                return implode(' ', $links);
+            },
+            'format' => 'html',
+            'options' => ['width' => '170px'],
+        ],
+        [
             'class' => ActionColumn::className(),
             'template' => implode(' ', $permissions),
+            'options' => ['width' => '50px'],
         ]
     ]
 ]);
