@@ -13,26 +13,18 @@ use yii\web\View;
 /* @var $project Project */
 /* @var $repository BaseRepository */
 /* @var $filesList File[] */
-/* @var $currentPath array */
+/* @var $breadcrumbs array */
 ?>
 
 <?= ProjectPanel::widget(['project' => $project]) ?>
 
 <h4><?= Yii::t('project', 'Tree') ?></h4>
 
-<div class="project-tree-path">
-    <?php reset($currentPath); while ($path = current($currentPath)):?>
-        <strong><?= Html::a(Html::encode($path['value']), [
-            '/project/project/tree',
-            'id' => $project->id,
-            'subDir' => $path['subDir'],
-        ]) ?></strong>
-        <?php if (next($currentPath)):?>
-            <?= DIRECTORY_SEPARATOR ?>
-        <?php endif;?>
-    <?php endwhile;?>
+<?= $this->render('_breadcrumbs', [
+    'project' => $project,
+    'breadcrumbs' => $breadcrumbs,
+]) ?>
 
-</div>
 <table class="project-tree table table-striped table-bordered">
     <?php foreach ($filesList as $file):?>
     <tr>
@@ -41,9 +33,9 @@ use yii\web\View;
         <td class="project-tree-file-path">
             <?php if ($file instanceof Directory):?>
                 <?= Html::a(Html::encode(basename($file->getPathname())), [
-                    '/project/project/tree',
+                    '/project/tree/raw',
                     'id' => $project->id,
-                    'subDir' => $file->getRelativePath(),
+                    'path' => $file->getRelativePath(),
                 ]) ?>
             <?php else:?>
                 <?= Html::encode(basename($file->getPathname())) ?>
@@ -52,13 +44,13 @@ use yii\web\View;
         <td class="project-tree-file-links">
             <?php if ($file instanceof Directory):?>
                 <?= Html::a('[tree]', [
-                    '/project/project/tree',
+                    '/project/tree/raw',
                     'id' => $project->id,
-                    'subDir' => $file->getRelativePath(),
+                    'path' => $file->getRelativePath(),
                 ]) ?>
             <?php elseif (!$file instanceof FileLink):?>
                 <?= Html::a('[raw]', [
-                    '/project/project/raw',
+                    '/project/tree/raw',
                     'id' => $project->id,
                     'path' => $file->getRelativePath(),
                 ]) ?>

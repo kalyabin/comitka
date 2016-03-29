@@ -54,7 +54,7 @@ print GridView::widget([
                     'type' => 'graph',
                 ]);
                 $links[] = Html::a('[tree]', [
-                    '/project/project/tree',
+                    '/project/tree/raw',
                     'id' => $data->id,
                 ]);
                 return implode(' ', $links);

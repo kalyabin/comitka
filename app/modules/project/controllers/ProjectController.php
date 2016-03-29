@@ -37,7 +37,7 @@ class ProjectController extends Controller
                     [
                         'allow' => true,
                         'roles' => ['@'],
-                        'actions' => ['index', 'tree'],
+                        'actions' => ['index'],
                     ],
                     [
                         'allow' => true,
@@ -74,47 +74,6 @@ class ProjectController extends Controller
 
         return $this->render('index', [
             'dataProvider' => $dataProvider,
-        ]);
-    }
-
-    /**
-     * View project path tree
-     *
-     * @param integer $id Project identifier
-     * @param string $subDir Relative project path (null if root)
-     */
-    public function actionTree($id, $subDir = null)
-    {
-        $subDir = trim($subDir, DIRECTORY_SEPARATOR);
-
-        $project = $this->findModel($id);
-
-        $repository = $project->getRepositoryObject();
-        $filesList = $repository->getFilesList($subDir);
-
-        $previewPath = null;
-        $currentPath = array_map(function($value) use (&$previewPath) {
-            $path = $value;
-            if ($previewPath !== null) {
-                $path = $previewPath . DIRECTORY_SEPARATOR . $value;
-            }
-            $previewPath = $path;
-            return [
-                'subDir' => $path,
-                'value' => $value,
-            ];
-        }, $subDir === null ? [] : explode(DIRECTORY_SEPARATOR, FileHelper::normalizePath($subDir)));
-
-        array_unshift($currentPath, [
-            'subDir' => null,
-            'value' => $project->title,
-        ]);
-
-        return $this->render('files-tree', [
-            'project' => $project,
-            'repository' => $repository,
-            'filesList' => $filesList,
-            'currentPath' => $currentPath,
         ]);
     }
 
