@@ -36,7 +36,7 @@ HistoryGraphAsset::register($this, [
 ?>
 <?=ProjectPanel::widget(['project' => $project])?>
 
-<h4><?=Yii::t('project', 'Changes')?></h4>
+<h4><?=Yii::t('project', 'Change log')?></h4>
 <div id="historyGraph"></div>
 <div class="list-group" id="historySimple">
     <?php foreach ($history as $commit):?>
