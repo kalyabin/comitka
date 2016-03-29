@@ -4,11 +4,12 @@ namespace project\controllers\actions;
 use project\models\Project;
 use VcsCommon\BaseBranch;
 use VcsCommon\BaseCommit;
-use VcsCommon\exception\CommonException;
+use VcsCommon\BaseRepository;
 use Yii;
 use yii\base\Action;
 use yii\base\InvalidParamException;
 use yii\data\Pagination;
+use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
@@ -48,6 +49,11 @@ class LogAction extends Action
     public $type;
 
     /**
+     * @var string Relative project path to view log (null if root history)
+     */
+    public $path = null;
+
+    /**
      * Validate input vars before run action
      *
      * @throws InvalidParamException
@@ -58,11 +64,18 @@ class LogAction extends Action
         if (!$this->project instanceof Project) {
             throw new InvalidParamException('Repository property must be an instance of \project\models\Project');
         }
-        if (!$this->repository instanceof \VcsCommon\BaseRepository) {
+        if (!$this->repository instanceof BaseRepository) {
             throw new InvalidParamException('Repository property must be an instance of \VcsCommon\BaseRepository');
         }
         if (!is_string($this->type)) {
             throw new InvalidParamException('History type must be a string');
+        }
+        if (!is_null($this->path) && $this->type != self::TYPE_SIMPLE) {
+            throw new NotFoundHttpException('Graph history is not supported for relative path');
+        }
+        // normalize relative path
+        if (!is_null($this->path)) {
+            $this->path = trim(FileHelper::normalizePath($this->path), DIRECTORY_SEPARATOR);
         }
     }
 
@@ -87,7 +100,7 @@ class LogAction extends Action
 
         // view simple log
         if ($this->type == self::TYPE_SIMPLE) {
-            $history = $this->repository->getHistory(self::PAGE_LIMIT, $skip);
+            $history = $this->repository->getHistory(self::PAGE_LIMIT, $skip, $this->path);
         }
         // view graph log
         else if ($this->type == self::TYPE_GRAPH) {
@@ -114,9 +127,11 @@ class LogAction extends Action
 
         return $this->controller->render('log/' . $this->type, [
             'project' => $this->project,
+            'repository' => $this->repository,
             'pagination' => $pagination,
             'history' => $history,
             'branches' => $branches,
+            'path' => $this->path,
         ]);
     }
 

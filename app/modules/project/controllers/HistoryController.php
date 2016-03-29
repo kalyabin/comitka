@@ -56,6 +56,7 @@ class HistoryController extends Controller
                 'project' => $project,
                 'repository' => $repository,
                 'type' => Yii::$app->request->get('type'),
+                'path' => Yii::$app->request->get('path'),
             ],
             'commit-summary' => [
                 'class' => CommitSummaryAction::className(),

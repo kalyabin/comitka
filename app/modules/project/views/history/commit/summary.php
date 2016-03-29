@@ -49,6 +49,8 @@ use yii\web\View;
 <?php
 foreach ($commit->getChangedFiles() as $item):
     print RevisionFile::widget([
+        'repository' => $repository,
+        'project' => $project,
         'commit' => $commit,
         'file' => $item,
     ]);

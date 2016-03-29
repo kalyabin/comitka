@@ -1,5 +1,6 @@
 <?php
 
+use project\controllers\actions\LogAction;
 use project\models\Project;
 use project\widgets\ProjectPanel;
 use VcsCommon\BaseRepository;
@@ -58,9 +59,10 @@ use yii\web\View;
 
             <?php if ($repository->pathIsNotIgnored($file->getRelativePath())):?>
                 <?= Html::a('[history]', [
-                    '/project/history/path-history',
+                    '/project/history/log',
                     'id' => $project->id,
                     'path' => $file->getRelativePath(),
+                    'type' => LogAction::TYPE_SIMPLE
                 ]) ?>
             <?php endif;?>
         </td>
