@@ -1,10 +1,14 @@
 <?php
 
 use Codeception\TestCase\Test;
-use GitView\Commit;
-use GitView\Repository;
 use project\models\Project;
+use VcsCommon\BaseCommit;
+use VcsCommon\BaseRepository;
 use VcsCommon\Graph;
+use HgView\Repository as HgRepository;
+use GitView\Repository as GitRepository;
+use HgView\Commit as HgCommit;
+use GitView\Commit as GitCommit;
 
 /**
  * Tests project: create, update, get repository instance and delete
@@ -31,6 +35,55 @@ class ProjectManagerTest extends Test
     }
 
     /**
+     * Check repo path validation
+     *
+     * @param Project $model Validation model
+     * @param string $repoType From Project::REPO_* constants
+     */
+    protected function checkRepoPath(Project $model, $repoType)
+    {
+        $model->repo_path = null;
+        $this->assertFalse($model->validate());
+        $this->assertArrayHasKey('repo_path', $model->getErrors(), 'Check repo_path validation');
+
+        $model->repo_path = '/root/';
+        $this->assertFalse($model->validate());
+        $this->assertArrayHasKey('repo_path', $model->getErrors(), 'Check repo_path validation');
+
+        $hgRepoPath = Yii::$app->params['testingVariables']['hgProjectPath'];
+        $gitRepoPath = Yii::$app->params['testingVariables']['gitProjectPath'];
+
+        $invalidRepos = [
+            Project::REPO_GIT => [$hgRepoPath],
+            Project::REPO_HG => [$gitRepoPath],
+        ];
+
+        $validRepos = [
+            Project::REPO_GIT => $gitRepoPath,
+            Project::REPO_HG => $hgRepoPath,
+        ];
+
+        // first check invalid repos
+        $model->repo_type = $repoType;
+        foreach ($invalidRepos[$repoType] as $repoPath) {
+            $model->repo_path = $repoPath;
+            $this->assertFalse($model->validate());
+            $this->assertArrayHasKey('repo_type', $model->getErrors(), 'Check repo_type validation');
+
+            $model->repo_path = $repoPath . '/.gitignore';
+            $this->assertFalse($model->validate());
+            $this->assertArrayHasKey('repo_path', $model->getErrors(), 'Check repo_path validation');
+
+            $model->repo_path = $repoPath . '/.hgignore';
+            $this->assertFalse($model->validate());
+            $this->assertArrayHasKey('repo_path', $model->getErrors(), 'Check repo_path validation');
+        }
+
+        $model->repo_path = $validRepos[$repoType];
+        $this->assertTrue($model->validate());
+    }
+
+    /**
      * Check create a project
      *
      * @return Project
@@ -49,27 +102,10 @@ class ProjectManagerTest extends Test
         $this->assertFalse($model->validate());
         $this->assertArrayNotHasKey('title', $model->getErrors());
 
-        // check repo path
-        $this->assertArrayHasKey('repo_path', $model->getErrors(), 'Check repo path error validation');
-        $model->repo_path = self::$projectPath . '/.gitignore';
-        $this->assertFalse($model->validate());
-        $this->assertArrayHasKey('repo_path', $model->getErrors(), 'Check repo path error validation');
-        $model->repo_path = '/root/';
-        $this->assertFalse($model->validate());
-        $this->assertArrayHasKey('repo_path', $model->getErrors(), 'Check repo path error validation');
-        $model->repo_path = self::$projectPath . '/';
-        $this->assertFalse($model->validate());
-        $this->assertArrayNotHasKey('repo_path', $model->getErrors());
+        $this->checkRepoPath($model, Project::REPO_HG);
+        $this->checkRepoPath($model, Project::REPO_GIT);
 
-        // check repo type
-        $model->repo_type = Project::REPO_HG;
-        $this->assertFalse($model->validate());
-        $this->assertArrayHasKey('repo_type', $model->getErrors(), 'Check repo type error validation');
-        $model->repo_type = Project::REPO_GIT;
-        $this->assertTrue($model->validate(), 'Check every field is validated');
-
-        $result = $model->save();
-        $this->assertTrue($result);
+        $this->assertTrue($model->save());
         $this->assertFalse($model->isNewRecord);
 
         return $model;
@@ -84,13 +120,11 @@ class ProjectManagerTest extends Test
      */
     public function testUpdateProject(Project $project)
     {
+        /* @var $model Project */
         $model = Project::findOne($project->id);
         $this->assertInstanceOf(Project::className(), $model);
 
-        $model->repo_type = Project::REPO_HG;
-        $this->assertFalse($model->validate());
-        $this->assertArrayHasKey('repo_type', $model->getErrors(), 'Check wrong repo type');
-        $model->repo_type = Project::REPO_GIT;
+        $model->title = 'New repo title';
         $this->assertTrue($model->validate());
         $this->assertTrue($model->save());
 
@@ -102,46 +136,29 @@ class ProjectManagerTest extends Test
      *
      * @depends testUpdateProject
      * @param Project $project
-     * @return Repository
+     * @return Project
      */
     public function testGetRepository(Project $project)
     {
-        $repository = $project->getRepositoryObject();
-        $this->assertInstanceOf(Repository::className(), $repository, 'Check get repository object');
-        return $repository;
-    }
+        // change repo path to HG first
+        $project->repo_path = Yii::$app->params['testingVariables']['hgProjectPath'];
+        $project->repo_type = Project::REPO_HG;
 
-    /**
-     * Tests get repository history
-     *
-     * @depends testGetRepository
-     * @param Repository $repository
-     */
-    public function testGetRepositoryHistory(Repository $repository)
-    {
-        $history = $repository->getHistory(10, 2);
-        $this->assertContainsOnly(Commit::className(), $history);
-        $this->assertCount(10, $history);
-    }
+        $this->assertInstanceOf(HgRepository::className(), $project->getRepositoryObject(), 'Check get HG repository object');
 
-    /**
-     * Tests graph repository
-     *
-     * @depends testGetRepository
-     * @param Repository $repository
-     */
-    public function testGetRepositoryGraphHistory(Repository $repository)
-    {
-        $graph = $repository->getGraphHistory(10, 2);
-        $this->assertInstanceOf(Graph::className(), $graph);
-        $this->assertCount(10, $graph->getCommits());
-        $this->assertContainsOnly(Commit::className(), $graph->getCommits());
+        // change repo path to GIT
+        $project->repo_path = Yii::$app->params['testingVariables']['gitProjectPath'];
+        $project->repo_type = Project::REPO_GIT;
+
+        $this->assertInstanceOf(GitRepository::className(), $project->getRepositoryObject(), 'Check get GIT repository object');
+
+        return $project;
     }
 
     /**
      * Tests remove project
      *
-     * @depends testUpdateProject
+     * @depends testGetRepository
      * @param Project $model
      */
     public function testRemoveProject(Project $model)
