@@ -175,6 +175,10 @@ class Project extends ActiveRecord
             /* @var $gitWrapper GitWrapper */
             $gitWrapper = Yii::$app->gitWrapper;
             return $gitWrapper->getRepository($this->repo_path);
+        } elseif ($this->repo_type == self::REPO_HG) {
+            /* @var $hgWrapper HgWrapper */
+            $hgWrapper = Yii::$app->hgWrapper;
+            return $hgWrapper->getRepository($this->repo_path);
         }
 
         throw new CommonException(Yii::t('project', 'Unknown repo type'));

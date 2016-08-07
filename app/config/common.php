@@ -44,6 +44,10 @@ $config = ArrayHelper::merge([
             'class' => 'GitView\GitWrapper',
             'cmd' => isset($localParams['git']['cmd']) ? $localParams['git']['cmd'] : 'git',
         ],
+        'hgWrapper' => [
+            'class' => 'HgView\HgWrapper',
+            'cmd' => isset($localParams['hg']['cmd']) ? $localParams['hg']['cmd'] : 'hg',
+        ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
