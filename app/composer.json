@@ -7,9 +7,9 @@
         "yiisoft/yii2-debug": "*",
         "yiisoft/yii2-gii": "*",
         "yiisoft/yii2-faker": "*",
-        "bower-asset/raphael": "^2.1",
         "kalyabin/yii2-git-view": "*",
-        "kalyabin/yii2-hg-view": "*"
+        "kalyabin/yii2-hg-view": "*",
+        "DmitryBaranovskiy/raphael": "^2.0"
     },
     "extra": {
         "asset-installer-paths": {
@@ -32,6 +32,18 @@
                     "url": "https://github.com/isagalaev/highlight.js",
                     "type": "git",
                     "reference": "9.2.0"
+                }
+            }
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "DmitryBaranovskiy/raphael",
+                "version": "2.0",
+                "source": {
+                    "url": "https://github.com/DmitryBaranovskiy/raphael.git",
+                    "type": "git",
+                    "reference": "2.0"
                 }
             }
         }

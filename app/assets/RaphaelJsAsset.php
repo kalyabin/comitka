@@ -8,7 +8,7 @@ use yii\web\AssetBundle;
  */
 class RaphaelJsAsset extends AssetBundle
 {
-    public $sourcePath = '@bower/raphael';
+    public $sourcePath = '@vendor/DmitryBaranovskiy/raphael';
     public $css = [
     ];
     public $js = [
