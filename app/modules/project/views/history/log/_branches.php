@@ -5,9 +5,11 @@ use VcsCommon\BaseCommit;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\web\View;
+use project\models\Project;
 
 /* @var $this View */
 /* @var $branches BaseBranch[] */
+/* @var $project Project */
 ?>
 
 <h4><?=Yii::t('project', 'Branches')?></h4>
@@ -26,7 +28,7 @@ use yii\web\View;
                 <span class="commit-date"><?=$commit->getDate()->format('d\'M y H:i:s')?></span>
             </div>
             <div class="col-md-9">
-                <a href="<?=Url::to(['commit', 'id' => $commit->getId()])?>">
+                <a href="<?=Url::to(['commit-summary', 'id' => $project->id, 'commitId' => $commit->getId()])?>">
                     <strong class="list-group-item-heading"><?=Html::encode($commit->message)?></strong>
                 </a>
             </div>

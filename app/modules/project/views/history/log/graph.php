@@ -64,5 +64,6 @@ HistoryGraphAsset::register($this, [
 ])?>
 
 <?=$this->render('_branches', [
+    'project' => $project,
     'branches' => $branches,
 ])?>

@@ -67,6 +67,7 @@ use yii\widgets\LinkPager;
 
 <?php if (is_null($path)):?>
     <?= $this->render('_branches', [
+        'project' => $project,
         'branches' => $branches,
     ]) ?>
 <?php endif;?>
