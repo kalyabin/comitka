@@ -12,17 +12,14 @@ $localCfg = is_file(__DIR__ . '/common.local.php') ? include __DIR__ . '/common.
 
 $mailerConfig = [
     'class' => 'app\components\Mailer',
-    'useFileTransport' => !isset($localParams['mailMethod']) && defined('YII_ENV_DEV') && YII_ENV_DEV === true,
+    'useFileTransport' => !isset($localParams['smtp']) && defined('YII_ENV_DEV') && YII_ENV_DEV === true,
     'viewPath' => '@app/mail',
     'messageConfig' => [
         'charset' => 'UTF-8',
     ],
 ];
 
-if (
-    isset($localParams['mailMethod'], $localParams['smtp']) &&
-    $localParams['mailMethod'] == 'smtp'
-) {
+if (isset($localParams['smtp'])) {
     $mailerConfig = ArrayHelper::merge([
         'transport' => [
             'class' => 'Swift_SmtpTransport',

@@ -12,7 +12,6 @@ $filters = [
     'git', 'git.cmd',
     'hg', 'hg.cmd',
     'emailFrom',
-    'mailMethod',
     'smtp', 'smtp.host', 'smtp.port', 'smtp.username', 'smtp.password', 'smtp.encryption',
 ];
 
