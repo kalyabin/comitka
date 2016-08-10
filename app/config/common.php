@@ -4,14 +4,36 @@
  */
 
 use yii\helpers\ArrayHelper;
-use yii\helpers\Json;
 
 // local system params as database connection, base_url or mail params
-$localParams = Json::decode(
-    file_get_contents(dirname(dirname(__DIR__)) . '/conf.d/parameters.json')
-);
+$localParams = include __DIR__ . '/params.php';
 // rewrite common using local config
 $localCfg = is_file(__DIR__ . '/common.local.php') ? include __DIR__ . '/common.local.php' : [];
+
+$mailerConfig = [
+    'class' => 'app\components\Mailer',
+    'useFileTransport' => !isset($localParams['mailMethod']) && defined('YII_ENV_DEV') && YII_ENV_DEV === true,
+    'viewPath' => '@app/mail',
+    'messageConfig' => [
+        'charset' => 'UTF-8',
+    ],
+];
+
+if (
+    isset($localParams['mailMethod'], $localParams['smtp']) &&
+    $localParams['mailMethod'] == 'smtp'
+) {
+    $mailerConfig = ArrayHelper::merge([
+        'transport' => [
+            'class' => 'Swift_SmtpTransport',
+            'host' => $localParams['smtp']['host'],
+            'username' => $localParams['smtp']['username'],
+            'password' => $localParams['smtp']['password'],
+            'port' => $localParams['smtp']['port'],
+            'encryption' => $localParams['smtp']['encryption'],
+        ]
+    ], $mailerConfig);
+}
 
 $config = ArrayHelper::merge([
     'basePath' => dirname(__DIR__),
@@ -22,14 +44,7 @@ $config = ArrayHelper::merge([
         '@app' => dirname(__DIR__),
     ], include __DIR__ . '/aliases.php'),
     'components' => [
-        'mailer' => [
-            'class' => 'yii\swiftmailer\Mailer',
-            'useFileTransport' => true,
-            'viewPath' => '@app/mail',
-            'messageConfig' => [
-                'charset' => 'UTF-8',
-            ],
-        ],
+        'mailer' => $mailerConfig,
         'i18n' => [
             'translations' => [
                 '*' => [

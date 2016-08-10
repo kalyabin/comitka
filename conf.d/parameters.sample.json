@@ -14,5 +14,14 @@
     },
     "hg": {
         "cmd": "hg"
+    },
+    "emailFrom": "robot@example.com",
+    "mailMethod": "php|smtp",
+    "smtp": {
+        "host": "smtp.example.com",
+        "port": 587,
+        "username": "username",
+        "password": "password",
+        "encryption": "tls"
     }
 }

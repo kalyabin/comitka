@@ -16,4 +16,4 @@ Thumbs.db
 .DS_Store
 
 # local config files
-/conf.d/*.json
+/conf.d/parameters.json
