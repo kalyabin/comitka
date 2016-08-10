@@ -44,7 +44,7 @@ class UserForm extends User
     {
         return [
             ['sendNotification', 'boolean'],
-            ['roles', 'required'],
+            ['roles', 'required', 'on' => ['update', 'create']],
             ['roles', 'each', 'rule' => [
                 'in', 'range' => array_keys($this->getRolesList()), 'skipOnEmpty' => false
             ]],
