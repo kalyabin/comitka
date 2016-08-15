@@ -11,7 +11,7 @@ use VcsCommon\File;
 use Yii;
 use yii\base\Action;
 use yii\base\InvalidParamException;
-use yii\web\ForbiddenHttpException;
+use yii\helpers\StringHelper;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\ServerErrorHttpException;
@@ -31,6 +31,11 @@ class FileViewAction extends Action
      * Mode view raw
      */
     const MODE_RAW = 'raw';
+
+    /**
+     * Mode view raw binary
+     */
+    const MODE_RAW_BINARY = 'raw_binary';
 
     /**
      * Mode view compare
@@ -69,10 +74,6 @@ class FileViewAction extends Action
      */
     public function init()
     {
-        if (!Yii::$app->request->isAjax) {
-            // only AJAX access
-            throw new ForbiddenHttpException();
-        }
         if (!$this->project instanceof Project) {
             throw new InvalidParamException('Repository property must be an instance of \project\models\Project');
         }
@@ -103,28 +104,51 @@ class FileViewAction extends Action
         $fileDiff = [];
         /* @var $fileContents string */
         $fileContents = '';
+        $isBinary = false;
 
         try {
             // get commit model by commit identifier
             $commit = $this->repository->getCommit($this->commitId);
+            $fileDiff = $commit->getDiff($this->filePath);
+            $isBinary = isset($fileDiff[0]) && $fileDiff[0]->getIsBinary();
 
-            if (
-                $this->mode === self::MODE_DIFF ||
-                ($this->mode === self::MODE_COMPARE && $commit->getFileStatus($this->filePath) === File::STATUS_MODIFIED)
-            ) {
-                // get file diff if diff or compare mode
-                $fileDiff = $commit->getDiff($this->filePath);
+            if ($this->mode === self::MODE_RAW_BINARY && $isBinary) {
+                // returns raw binary file
+                $images = [
+                    'png' => 'image/png',
+                    'jpg' => 'image/jpeg',
+                    'jpeg' => 'image/jpeg',
+                    'gif' => 'image/gif',
+                ];
+                $pathinfo = pathinfo($this->filePath);
+                $mimeType = isset($images[strtolower($pathinfo['extension'])]) ?
+                        $images[strtolower($pathinfo['extension'])] :
+                        'application/octet-stream';
+                if (!StringHelper::startsWith($mimeType, 'image/')) {
+                    header('Content-Description: File Transfer');
+                    header('Content-Disposition: attachment; filename=' . basename($this->filePath));
+                }
+                header('Content-Type: ' . $mimeType);
+                header('Content-Transfer-Encoding: binary');
+                header('Expires: 0');
+                header('Cache-Control: must-revalidate');
+                header('Pragma: public');
+                $commit->getRawBinaryFile($this->filePath, function($data) {
+                    print $data;
+                    flush();
+                });
+                exit();
             }
             elseif (
                 $this->mode === self::MODE_RAW &&
                 $commit->getFileStatus($this->filePath) != File::STATUS_DELETION
             ) {
                 // modified file
-                $fileContents = $commit->getRawFile($this->filePath);
+                $fileContents = $isBinary ? '' : $commit->getRawFile($this->filePath);
             }
             elseif ($this->mode === self::MODE_RAW) {
                 // moved file
-                $fileContents = $commit->getPreviousRawFile($this->filePath);
+                $fileContents = $isBinary ? '' : $commit->getPreviousRawFile($this->filePath);
             }
         }
         catch (CommonException $ex) {
@@ -137,10 +161,10 @@ class FileViewAction extends Action
 
         switch ($this->mode) {
             case self::MODE_DIFF:
-                $viewFile = 'file_diff';
+                $viewFile = $isBinary ? 'file_raw' : 'file_diff';
                 break;
             case self::MODE_COMPARE:
-                $viewFile = 'file_compare';
+                $viewFile = $isBinary ? 'file_raw' : 'file_compare';
                 break;
             case self::MODE_RAW:
                 $viewFile = 'file_raw';
@@ -152,10 +176,12 @@ class FileViewAction extends Action
         return [
             'diff' => Yii::t('project', 'Revision') . ': ' .$commit->getId(),
             'html' => $this->controller->renderAjax('commit/' . $viewFile, [
+                'project' => $this->project,
                 'commit' => $commit,
                 'diffs' => $fileDiff,
                 'fileContents' => $fileContents,
                 'path' => $this->filePath,
+                'isBinary' => $isBinary,
             ]),
         ];
     }
