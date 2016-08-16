@@ -20,7 +20,8 @@
     "minimum-stability": "dev",
     "require-dev": {
         "codeception/codeception": "*",
-        "phpunit/phpunit": "*"
+        "phpunit/phpunit": "*",
+        "internet-design/yii2-svk-tests": "*"
     },
     "repositories": [
         {

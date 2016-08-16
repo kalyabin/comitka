@@ -1,20 +1,17 @@
 <?php
 
-use Codeception\TestCase\Test;
-use project\models\Project;
-use VcsCommon\BaseCommit;
-use VcsCommon\BaseRepository;
-use VcsCommon\Graph;
-use HgView\Repository as HgRepository;
 use GitView\Repository as GitRepository;
-use HgView\Commit as HgCommit;
-use GitView\Commit as GitCommit;
+use HgView\Repository as HgRepository;
+use project\models\Project;
+use svk\tests\StaticAppTestCase;
 
 /**
  * Tests project: create, update, get repository instance and delete
  */
-class ProjectManagerTest extends Test
+class ProjectManagerTest extends StaticAppTestCase
 {
+    use svk\tests\StaticTransactionalTrait;
+
     /**
      * @var UnitTester
      */
@@ -27,11 +24,14 @@ class ProjectManagerTest extends Test
 
     public static function setUpBeforeClass()
     {
-        self::$projectPath = dirname(YII_APP_BASE_PATH);
+        self::beginStaticTransaction();
 
-        Project::deleteAll([
-            'repo_path' => self::$projectPath,
-        ]);
+        self::$projectPath = dirname(YII_APP_BASE_PATH);
+    }
+
+    public static function tearDownAfterClass()
+    {
+        self::rollBackStaticTransaction();
     }
 
     /**

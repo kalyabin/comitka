@@ -1,6 +1,7 @@
 <?php
 
-use Codeception\TestCase\Test;
+use svk\tests\StaticAppTestCase;
+use user\models\ChangePasswordForm;
 use user\models\User;
 use user\models\UserForm;
 use user\UserModule;
@@ -8,8 +9,10 @@ use user\UserModule;
 /**
  * Test user manager: create user, update user and remove him
  */
-class UserManagerTest extends Test
+class UserManagerTest extends StaticAppTestCase
 {
+    use svk\tests\StaticTransactionalTrait;
+
     /**
      * @var UnitTester
      */
@@ -22,12 +25,14 @@ class UserManagerTest extends Test
 
     public static function setUpBeforeClass()
     {
-        self::$userModule = Yii::$app->getModule('user');
+        self::beginStaticTransaction();
 
-        // delete preview user if exists
-        User::deleteAll([
-            'email' => 'tester@test.ru',
-        ]);
+        self::$userModule = Yii::$app->getModule('user');
+    }
+
+    public static function tearDownAfterClass()
+    {
+        self::rollBackStaticTransaction();
     }
 
     /**
@@ -36,6 +41,8 @@ class UserManagerTest extends Test
     public function testCreateUser()
     {
         $user = new UserForm();
+
+        $user->setScenario('create');
 
         // create user and check every error
         $this->assertFalse($user->validate(), 'Check error validation');
@@ -64,7 +71,7 @@ class UserManagerTest extends Test
         $this->assertEquals($foundUser->id, $user->id);
 
         // change user password
-        $changePasswordForm = new \user\models\ChangePasswordForm();
+        $changePasswordForm = new ChangePasswordForm();
         $this->assertFalse($changePasswordForm->validate(), 'Check error validation');
         $this->assertArrayHasKey('password', $changePasswordForm->getErrors(), 'Check has password error');
         $changePasswordForm->password = 'new user password';
@@ -102,6 +109,8 @@ class UserManagerTest extends Test
         $user = UserForm::findOne($user->id);
         $this->assertInstanceOf(UserForm::className(), $user);
 
+        $user->setScenario('update');
+
         $oldPassword = $user->password;
 
         // remove role
@@ -131,7 +140,7 @@ class UserManagerTest extends Test
      *
      * @depends testUpdateUser
      */
-    public function testLockingUser(User $user)
+    public function testLockUser(User $user)
     {
         $result = self::$userModule->lockUser($user);
         $this->assertTrue($result);

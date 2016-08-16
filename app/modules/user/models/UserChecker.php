@@ -33,6 +33,7 @@ class UserChecker extends ActiveRecord
         return [
             [['user_id'], 'required'],
             [['user_id'], 'integer'],
+            [['user_id'], 'unique'],
             [['email_checker'], 'string', 'max' => 32]
         ];
     }

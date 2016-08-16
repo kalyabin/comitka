@@ -11,12 +11,14 @@ use yii\web\IdentityInterface;
 /**
  * Model of user and identity class.
  *
- * @property integer $id
- * @property string $name
- * @property string $email
- * @property string $password
- * @property integer $status
- * @property UserChecker $checker
+ * @property integer $id User primary key
+ * @property string $name Username
+ * @property string $email User email
+ * @property string $password Password hash
+ * @property integer $status User status by self::STATUS_* constants
+ *
+ * @property UserChecker $checker Checker model relation
+ * @property UserAccount[] $accounts VCS user accounts
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -28,7 +30,7 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * Max e-mail length
      */
-    const MAX_EMAIL_LENGTH =100;
+    const MAX_EMAIL_LENGTH = 100;
 
     /**
      * User is an unactive
@@ -70,6 +72,7 @@ class User extends ActiveRecord implements IdentityInterface
             ['email', 'unique'],
             ['status', 'integer'],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_UNACTIVE, self::STATUS_BLOCKED]],
+            ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['name', 'string', 'max' => self::MAX_NAME_LENGTH],
             ['email', 'string', 'max' => self::MAX_EMAIL_LENGTH],
             ['password', 'string', 'max' => 255],
@@ -197,6 +200,16 @@ class User extends ActiveRecord implements IdentityInterface
             $newModel->save();
         }
         return $this->hasOne(UserChecker::className(), ['user_id' => 'id']);
+    }
+
+    /**
+     * Get user's VCS accounts
+     *
+     * @return ActiveQuery
+     */
+    public function getAccounts()
+    {
+        return $this->hasMany(UserAccount::className(), ['user_id' => 'id']);
     }
 
     /**
