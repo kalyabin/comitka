@@ -18,8 +18,6 @@ use yii\widgets\ActiveForm;
  */
 class ProfileController extends Controller
 {
-    public $layout = '@app/views/layouts/one-column';
-
     /**
      * @var UserModule
      */

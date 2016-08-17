@@ -6,10 +6,12 @@ use user\components\Auth;
 use user\models\ChangePasswordForm;
 use user\models\ProfileForm;
 use user\models\User;
+use user\models\UserAccountForm;
 use user\models\UserChecker;
 use user\models\UserForm;
 use Yii;
 use yii\base\Module as BaseModule;
+use yii\db\Connection;
 use yii\helpers\Url;
 use yii\rbac\Assignment;
 use yii\rbac\DbManager;
@@ -453,5 +455,52 @@ class UserModule extends BaseModule
         }
 
         return false;
+    }
+
+    /**
+     * Update user VCS bindings usernames (UserAccount relations).
+     *
+     * Returns true if each account successfully updated.
+     *
+     * Need to set deletionFlag to delete account from database.
+     *
+     * @param User $user User's model to wich need update usernames
+     * @param UserAccountForm[] $accounts Usernames form models
+     *
+     * @return boolean true if each account successfully updated
+     */
+    public function updateVcsBindings(User $user, array $accounts)
+    {
+        $success = false;
+
+        $transaction = $user->getDb()->beginTransaction();
+
+        try {
+            $cnt = 0;
+
+            foreach ($accounts as $account) {
+                /* @var $account UserAccountForm */
+                if (!$account->isNewRecord && $account->user_id != $user->id) {
+                    // this model do not belongs to current user
+                    continue;
+                }
+                if ($account->deletionFlag) {
+                    // remove account
+                    $cnt += $account->delete() == 1 ? 1 : 0;
+                }
+                else {
+                    $account->user_id = $user->id;
+                    $cnt += $account->save() ? 1 : 0;
+                }
+            }
+            $transaction->commit();
+
+            $success = $cnt == count($accounts);
+        } catch (Exception $ex) {
+            $success = false;
+            $transaction->rollBack();
+        }
+
+        return $success;
     }
 }

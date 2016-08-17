@@ -13,44 +13,46 @@ $form = ActiveForm::begin([
     'enableAjaxValidation' => true,
     'enableClientValidation' => true,
 ]);
+?>
 
-print Html::tag('h2', Yii::t('user', 'Common settings'));
-
-print $form->field($model, 'name')->textInput(['maxlength' => true]);
-print $form->field($model, 'email')->textInput(['maxlength' => true]);
-
-if (!$model->isNewRecord) {
-    print $form->field($model, 'newPassword')->passwordInput();
-    print $form->field($model, 'newPasswordConfirmation')->passwordInput();
-    print $form->field($model, 'generateRandomPassword')->checkbox();
-}
-
-print $form->field($model, 'sendNotification')->checkbox();
-
-print Html::tag('h2', Yii::t('user', 'Permissions'));
-print $form->field($model, 'roles')->checkboxList($model->getRolesList(), [
-    'itemOptions' => [
-        'labelOptions' => ['style' => 'display:block;'],
-    ]
-]);
-
-if ($model->isNewRecord) {
-    print Html::submitButton(Yii::t('user', 'Create'), ['class' => 'btn btn-primary']);
-}
-else {
-    if (Yii::$app->user->can('updateUser')) {
-        print Html::submitButton(Yii::t('user', 'Update'), ['class' => 'btn btn-primary']);
-    }
-    if ($model->id != Yii::$app->user->getId() && Yii::$app->user->can('deleteUser') && $model->canSignIn()) {
-        print ' ';
-        print Html::a(Yii::t('user', 'Lock user'), ['lock', 'id' => $model->id], ['class' => 'btn btn-danger']);
-    }
-    else if ($model->id != Yii::$app->user->getId() && Yii::$app->user->can('deleteUser') && !$model->canSignIn()) {
-        print ' ';
-        print Html::a(Yii::t('user', 'Activate user'), ['activate', 'id' => $model->id], ['class' => 'btn btn-success']);
-    }
-}
-print ' ';
-print Html::a(Yii::t('user', 'Cancel'), ['index'], ['class' => 'btn btn-default']);
-
-ActiveForm::end();
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <?= Yii::t('user', 'Common settings') ?>
+    </div>
+    <div class="panel-body">
+        <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+        <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
+        <?php if (!$model->isNewRecord):?>
+            <?= $form->field($model, 'newPassword')->passwordInput() ?>
+            <?= $form->field($model, 'newPasswordConfirmation')->passwordInput() ?>
+            <?= $form->field($model, 'generateRandomPassword')->checkbox() ?>
+        <?php endif;?>
+        <?= $form->field($model, 'sendNotification')->checkbox() ?>
+    </div>
+    <div class="panel-heading">
+        <?= Yii::t('user', 'Permissions') ?>
+    </div>
+    <div class="panel-body">
+        <?= $form->field($model, 'roles')->checkboxList($model->getRolesList(), [
+            'itemOptions' => [
+                'labelOptions' => ['style' => 'display:block;'],
+            ]
+        ]) ?>
+    </div>
+    <div class="panel-footer">
+        <?php if ($model->isNewRecord):?>
+            <?= Html::submitButton(Yii::t('user', 'Create'), ['class' => 'btn btn-primary']) ?>
+        <?php else:?>
+            <?php if (Yii::$app->user->can('updateUser')):?>
+                <?= Html::submitButton(Yii::t('user', 'Update'), ['class' => 'btn btn-primary']) ?>
+            <?php endif;?>
+            <?php if ($model->id != Yii::$app->user->getId() && Yii::$app->user->can('deleteUser') && $model->canSignIn()):?>
+                <?= Html::a(Yii::t('user', 'Lock user'), ['lock', 'id' => $model->id], ['class' => 'btn btn-danger']) ?>
+            <?php elseif ($model->id != Yii::$app->user->getId() && Yii::$app->user->can('deleteUser') && !$model->canSignIn()):?>
+                <?= Html::a(Yii::t('user', 'Activate user'), ['activate', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
+            <?php endif;?>
+        <?php endif;?>
+        <?= Html::a(Yii::t('user', 'Cancel'), ['index'], ['class' => 'btn btn-default']) ?>
+    </div>
+</div>
+<?php ActiveForm::end(); ?>

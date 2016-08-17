@@ -94,8 +94,6 @@ class UserManagerController extends Controller
      */
     public function actionCreate()
     {
-        $this->layout = '@app/views/layouts/one-column';
-
         $model = new UserForm();
         $model->setScenario('create');
 
@@ -139,8 +137,6 @@ class UserManagerController extends Controller
      */
     public function actionUpdate($id)
     {
-        $this->layout = '@app/views/layouts/one-column';
-
         $model = UserForm::find()->andWhere(['id' => (int) $id])->one();
 
         if (!$model instanceof UserForm) {

@@ -3,6 +3,8 @@
 use svk\tests\StaticAppTestCase;
 use user\models\ChangePasswordForm;
 use user\models\User;
+use user\models\UserAccount;
+use user\models\UserAccountForm;
 use user\models\UserForm;
 use user\UserModule;
 
@@ -169,10 +171,47 @@ class UserManagerTest extends StaticAppTestCase
     }
 
     /**
+     * Tests VCS bindings update
+     *
+     * @param User $user
+     * @return User
+     *
+     * @depends testActivateUser
+     */
+    public function testVCSBindings(User $user)
+    {
+        $accounts = [
+            0 => new UserAccountForm([
+                'username' => 'testing user name git',
+                'type' => UserAccount::TYPE_GIT,
+            ]),
+            1 => new UserAccountForm([
+                'username' => 'testing user name hg',
+                'type' => UserAccount::TYPE_HG,
+            ])
+        ];
+
+        $this->assertTrue(self::$userModule->updateVcsBindings($user, $accounts));
+
+        $this->assertEquals(count($accounts), count($user->accounts));
+
+        unset ($user->accounts);
+
+        $accounts[0]->deletionFlag = true;
+
+        $this->assertTrue(self::$userModule->updateVcsBindings($user, $accounts));
+
+        $this->assertEquals(1, count($user->accounts));
+
+        return $user;
+    }
+
+    /**
      * Tests delete a user
      *
      * @param User $user
-     * @depends testActivateUser
+     *
+     * @depends testVCSBindings
      */
     public function testDeleteUser(User $user)
     {
