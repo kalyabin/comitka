@@ -34,6 +34,19 @@ class ProfileController extends Controller
     /**
      * @inheritdoc
      */
+    public function actions()
+    {
+        return [
+            'vcs-bindings' => [
+                'class' => actions\VcsBindingsAction::className(),
+                'model' => Yii::$app->user->identity,
+            ]
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function behaviors()
     {
         return ArrayHelper::merge(parent::behaviors(), [

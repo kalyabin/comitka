@@ -16,11 +16,21 @@ class UserAccountForm extends UserAccount
     /**
      * @inheritdoc
      */
+    public function rules()
+    {
+        return array_merge(parent::rules(), [
+            ['deletionFlag', 'boolean'],
+        ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function scenarios()
     {
         // from form can set only username and vcs type
         return [
-            self::SCENARIO_DEFAULT => ['username', 'type'],
+            self::SCENARIO_DEFAULT => ['username', 'type', 'deletionFlag'],
         ];
     }
 }

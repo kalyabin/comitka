@@ -4,6 +4,7 @@ namespace user\controllers;
 use app\components\Alert;
 use app\components\AuthControl;
 use Exception;
+use user\controllers\actions\VcsBindingsAction;
 use user\models\UserForm;
 use user\models\UserSearch;
 use user\UserModule;
@@ -40,6 +41,19 @@ class UserManagerController extends Controller
     /**
      * @inheritdoc
      */
+    public function actions()
+    {
+        return [
+            'vcs-bindings' => [
+                'class' => VcsBindingsAction::className(),
+                'userId' => Yii::$app->request->get('id'),
+            ],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function behaviors()
     {
         return ArrayHelper::merge(parent::behaviors(), [
@@ -59,7 +73,7 @@ class UserManagerController extends Controller
                     [
                         'allow' => true,
                         'roles' => ['updateUser'],
-                        'actions' => ['update'],
+                        'actions' => ['update', 'vcs-bindings'],
                     ],
                     [
                         'allow' => true,
@@ -137,11 +151,7 @@ class UserManagerController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = UserForm::find()->andWhere(['id' => (int) $id])->one();
-
-        if (!$model instanceof UserForm) {
-            throw new NotFoundHttpException();
-        }
+        $model = $this->findModel($id);
 
         $model->setScenario('update');
 
@@ -179,16 +189,13 @@ class UserManagerController extends Controller
     /**
      * Users activation
      *
-     * @param integer $id
+     * @param integer $id User's id
      * @return mixed
      * @throws NotFoundHttpException
      */
     public function actionActivate($id)
     {
-        $model = UserForm::find()->andWhere(['id' => (int) $id])->one();
-        if (!$model instanceof UserForm) {
-            throw new NotFoundHttpException();
-        }
+        $model = $this->findModel($id);
 
         /* @var $systemAlert Alert */
         $systemAlert = Yii::$app->systemAlert;
@@ -217,10 +224,7 @@ class UserManagerController extends Controller
      */
     public function actionLock($id)
     {
-        $model = UserForm::find()->andWhere(['id' => (int) $id])->one();
-        if (!$model instanceof UserForm) {
-            throw new NotFoundHttpException();
-        }
+        $model = $this->findModel($id);
 
         /* @var $systemAlert Alert */
         $systemAlert = Yii::$app->systemAlert;
@@ -238,5 +242,27 @@ class UserManagerController extends Controller
         }
 
         return $this->redirect(['index']);
+    }
+
+    /**
+     * Find user model by id and generate 404 if model is not found.
+     *
+     * @param integer $id User id
+     *
+     * @return UserForm
+     *
+     * @throws NotFoundHttpException
+     */
+    protected function findModel($id)
+    {
+        $id = is_scalar($id) ? (int) $id : 0;
+
+        $model = UserForm::find()->andWhere(['id' => $id])->one();
+
+        if (!$model instanceof UserForm) {
+            throw new NotFoundHttpException();
+        }
+
+        return $model;
     }
 }
