@@ -17,7 +17,7 @@ use yii\widgets\Pjax;
 
 VCSBindingsAsset::register($this);
 
-$this->title = Html::encode($model->name);
+$this->title = Html::encode(Yii::t('user', 'Your profile'));
 ?>
 <div class="panel panel-default">
     <div class="panel-heading"><?= Yii::t('user', 'VCS bindings') ?></div>

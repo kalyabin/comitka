@@ -32,19 +32,24 @@ $newAccount = new UserAccountForm();
             'id' => 'userAccounts' . $model->id,
         ]);
         ?>
+        <div class="row col-md-12">
+            <div class="form-group">
+                <label class="control-label"><?= Yii::t('user', 'Username and VCS type') ?></label>
+            </div>
+        </div>
         <?php foreach ($accounts as $account):?>
         <div class="row js-binding-row" data-row-id="<?= $account->id ?>"<?php if ($account->deletionFlag):?> style="display:none;"<?php endif;?>>
             <div class="col-md-8">
-                <?= $form->field($account, "[{$account->id}]username")->textInput() ?>
+                <?= $form->field($account, "[{$account->id}]username")->label(false)->textInput() ?>
             </div>
             <div class="col-md-2">
-                <?= $form->field($account, "[{$account->id}]type")->label('&nbsp;')->dropDownList(UserAccountForm::getTypesForDropDown()) ?>
+                <?= $form->field($account, "[{$account->id}]type")->label(false)->dropDownList(UserAccountForm::getTypesForDropDown()) ?>
             </div>
             <div class="col-md-2">
                 <?php
                 $field = $form->field($account, "[{$account->id}]deletionFlag", [
-                    'template' => '<label class="control-label">&nbsp;</label><div style="display:none;">{input}</div>{button}'
-                ])->label('&nbsp;')->checkbox();
+                    'template' => '<div style="display:none;">{input}</div>{button}'
+                ])->label(false)->checkbox();
                 $field->parts['{button}'] = Html::button('<span class="glyphicon glyphicon-trash"></span>', [
                     'class' => 'btn btn-danger form-control js-remove-binding',
                     'data' => [
@@ -85,16 +90,20 @@ $newAccount = new UserAccountForm();
         'id' => 'newAccount' . $model->id,
     ]);
     ?>
+    <div class="row col-md-12">
+        <div class="form-group">
+            <label class="control-label"><?= Yii::t('user', 'Add new binding: type username and VCS type') ?></label>
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-8">
-            <?= $form->field($newAccount, "username")->textInput() ?>
+            <?= $form->field($newAccount, "username")->label(false)->textInput() ?>
         </div>
         <div class="col-md-2">
-            <?= $form->field($newAccount, "type")->label('&nbsp;')->dropDownList(UserAccountForm::getTypesForDropDown()) ?>
+            <?= $form->field($newAccount, "type")->label(false)->dropDownList(UserAccountForm::getTypesForDropDown()) ?>
         </div>
         <div class="col-md-2">
             <div class="form-group">
-                <label class="control-label">&nbsp;</label>
                 <?= Html::submitButton(Yii::t('user', 'Add'), [
                     'class' => 'btn btn-primary form-control',
                     'name' => 'add-new',
