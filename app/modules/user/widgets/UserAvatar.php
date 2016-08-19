@@ -36,8 +36,9 @@ class UserAvatar extends Widget
 
         $userAvatar = '';
 
-        if ($this->user instanceof User && ($avatarUrl = $this->user->getAvatarUrl()) !== false) {
-            $userAvatar =  Html::img($avatarUrl);
+        if ($this->user instanceof User) {
+            $avatarUrl = $this->user->getAvatarUrl();
+            $userAvatar = $avatarUrl ? Html::img($avatarUrl) : '';
         }
 
         if ($this->asBlock) {
