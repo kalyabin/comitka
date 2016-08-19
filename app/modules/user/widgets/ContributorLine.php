@@ -1,6 +1,9 @@
 <?php
 namespace user\widgets;
 
+use user\models\User;
+use user\UserModule;
+use Yii;
 use yii\base\Widget;
 use yii\helpers\Html;
 
@@ -25,18 +28,99 @@ class ContributorLine extends Widget
     public $contributorEmail;
 
     /**
-     * Render widget.
+     * @var string VCS type by UserAccount::TYPE_* constants
+     */
+    public $vcsType;
+
+    /**
+     * @var string Avatar size: small, middle, normal
+     */
+    public $avatarSize = 'middle';
+
+    /**
+     * @var boolean Show user's link
+     */
+    public $useLink = true;
+
+    /**
+     * @var User User model if user exists in a system
+     */
+    protected $user;
+
+    /**
+     * Retreive user model if it exists at database
+     */
+    public function init()
+    {
+        parent::init();
+
+        // get user model
+        /* @var $api UserModule */
+        $api = Yii::$app->getModule('user');
+
+        $this->user = $api->getUserByUsername($this->vcsType, $this->contributorName, $this->contributorEmail);
+    }
+
+    /**
+     * Render widget with user model
      *
      * @return string
      */
-    public function run()
+    protected function renderWithUserModel()
     {
-        $ret = Html::encode($this->contributorName);
+        $avatar =  UserAvatar::widget([
+            'user' => $this->user,
+            'size' => $this->avatarSize,
+        ]);
+        $text = $this->renderSimple(false);
+
+        return $this->useLink ? $avatar . Html::a($text, '#', [
+            'data' => [
+                'user-id' => $this->user->id,
+            ],
+            'role' => 'user-popup-button',
+        ]) : $avatar . $text;
+    }
+
+    /**
+     * Render widget without user model
+     *
+     * @param boolean $withAvatar Render avatar placeholder
+     *
+     * @return string
+     */
+    protected function renderSimple($withAvatar = true)
+    {
+        $ret = '';
+
+        if ($withAvatar) {
+            $ret .= UserAvatar::widget([
+                'size' => $this->avatarSize,
+            ]);
+        }
+
+        $ret .= Html::encode($this->contributorName);
 
         if ($this->contributorEmail) {
             $ret .= ' &lt;' . Html::encode($this->contributorEmail) . '&gt;';
         }
 
         return $ret;
+    }
+
+    /**
+     * Render widget.
+     *
+     * @return string
+     */
+    public function run()
+    {
+        if ($this->user instanceof User) {
+            return $this->renderWithUserModel();
+        }
+
+        return $this->renderSimple() . ' ' . Html::tag('span', Yii::t('user', 'Not registered'), [
+            'class' => 'label label-danger'
+        ]);
     }
 }

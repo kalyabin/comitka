@@ -2,8 +2,9 @@
 namespace user\controllers;
 
 use app\components\Alert;
+use user\controllers\actions\VcsBindingsAction;
 use user\models\ChangePasswordForm;
-use user\models\ProfileForm;
+use user\models\UserForm;
 use user\UserModule;
 use Yii;
 use yii\base\Model;
@@ -11,6 +12,7 @@ use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\Response;
+use yii\web\UploadedFile;
 use yii\widgets\ActiveForm;
 
 /**
@@ -38,7 +40,7 @@ class ProfileController extends Controller
     {
         return [
             'vcs-bindings' => [
-                'class' => actions\VcsBindingsAction::className(),
+                'class' => VcsBindingsAction::className(),
                 'model' => Yii::$app->user->identity,
             ]
         ];
@@ -65,14 +67,14 @@ class ProfileController extends Controller
     /**
      * Change profile wrapper
      *
-     * @param ProfileForm $model
+     * @param UserForm $model
      * @return mixed
      */
-    protected function changeProfile(ProfileForm $model)
+    protected function changeProfile(UserForm $model)
     {
         /* @var $systemAlert Alert */
         $systemAlert = Yii::$app->systemAlert;
-        if ($this->userModule->changeUserProfile($model, Yii::$app->user->identity)) {
+        if ($this->userModule->updateUser($model)) {
             $systemAlert->setMessage(Alert::INFO, Yii::t('user', 'Profile successfully changed'));
         }
         else {
@@ -108,13 +110,17 @@ class ProfileController extends Controller
     public function actionIndex()
     {
         // profile
-        $profileForm = ProfileForm::createFromExistsUser(Yii::$app->user->identity);
+        $profileForm = UserForm::findOne(Yii::$app->user->getId());
+        $profileForm->setScenario('profile');
+
         $ret = $this->performAjaxValidation($profileForm);
         if (is_array($ret)) {
             // AJAX validation
             return $ret;
         }
-        if ($profileForm->load(Yii::$app->request->post()) && $profileForm->validate()) {
+        $dataLoaded = $profileForm->load(Yii::$app->request->post());
+        $profileForm->uploadedAvatar = UploadedFile::getInstance($profileForm, 'uploadedAvatar');
+        if ($dataLoaded && $profileForm->validate()) {
             // change user's profile
             return $this->changeProfile($profileForm);
         }

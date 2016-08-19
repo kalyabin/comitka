@@ -2,6 +2,7 @@
 
 use project\models\Project;
 use project\widgets\ProjectPanel;
+use user\widgets\ContributorLine;
 use VcsCommon\BaseBranch;
 use VcsCommon\BaseCommit;
 use VcsCommon\BaseRepository;
@@ -46,16 +47,16 @@ use yii\widgets\LinkPager;
             <div class="col-md-2">
                 <span class="commit-date"><?=$commit->getDate()->format('d\'M y H:i:s')?></span>
             </div>
+            <div class="col-md-3">
+                <?= ContributorLine::widget([
+                    'contributorName' => $commit->contributorName,
+                    'vcsType' => $project->repo_type,
+                    'avatarSize' => 'small',
+                    'useLink' => false,
+                ]) ?>
+            </div>
             <div class="col-md-7 commit-message">
                 <strong class="list-group-item-heading"><?=Html::encode($commit->message)?></strong>
-            </div>
-            <div class="col-md-3">
-                <span class="commit-contributor">
-                    <?=Html::encode($commit->contributorName)?>
-                    <?php if ($commit->contributorEmail && false):?>
-                        &lt;<?=Html::encode($commit->contributorEmail)?>&gt;
-                    <?php endif;?>
-                </span>
             </div>
         </a>
     <?php endforeach;?>

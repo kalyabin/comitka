@@ -7,6 +7,7 @@ use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
+use yii\web\UploadedFile;
 
 /**
  * Model of user and identity class.
@@ -16,6 +17,7 @@ use yii\web\IdentityInterface;
  * @property string $email User email
  * @property string $password Password hash
  * @property integer $status User status by self::STATUS_* constants
+ * @property string $avatar Avatar relative filename
  *
  * @property UserChecker $checker Checker model relation
  * @property UserAccount[] $accounts VCS user accounts
@@ -46,6 +48,26 @@ class User extends ActiveRecord implements IdentityInterface
      * User is a blocked
      */
     const STATUS_BLOCKED = -1;
+
+    /**
+     * Relative path with users avatars
+     */
+    const AVATAR_PATH = '@app/../htdocs/storage/';
+
+    /**
+     * Relative URI with users avatars
+     */
+    const AVATAR_URL = '/storage/';
+
+    /**
+     * Maximum avatar width
+     */
+    const AVATAR_MAX_WIDTH = 150;
+
+    /**
+     * Maximum avatar height
+     */
+    const AVATAR_MAX_HEIGHT = 150;
 
     /**
      * @var string create new password hash if new password sent
@@ -79,7 +101,7 @@ class User extends ActiveRecord implements IdentityInterface
             ['password', 'required', 'when' => function($data) {
                 /* @var $data User */
                 return empty($data->newPassword);
-            }]
+            }],
         ];
     }
 
@@ -235,5 +257,15 @@ class User extends ActiveRecord implements IdentityInterface
     {
         $statuses = $this->getStatuses();
         return isset($statuses[$this->status]) ? $statuses[$this->status] : null;
+    }
+
+    /**
+     * Get avatar relative URI
+     *
+     * @return string
+     */
+    public function getAvatarUrl()
+    {
+        return is_file(Yii::getAlias(self::AVATAR_PATH . $this->avatar)) ? self::AVATAR_URL . $this->avatar : null;
     }
 }

@@ -38,7 +38,7 @@ class UserMenu extends Nav
         $this->items = [
             [
                 'url' => ['/user/user-manager/update', 'id' => $this->model->id],
-                'label' => Yii::t('user', 'Common settings and password'),
+                'label' => Yii::t('user', 'Common settings'),
             ],
             [
                 'url' => ['/user/user-manager/vcs-bindings', 'id' => $this->model->id],

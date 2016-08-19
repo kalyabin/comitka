@@ -1,14 +1,15 @@
 <?php
 
 use user\models\ChangePasswordForm;
-use user\models\ProfileForm;
+use user\models\UserForm;
 use user\widgets\ProfileMenu;
+use user\widgets\UserAvatar;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 use yii\web\View;
 
 /* @var $this View */
-/* @var $profileForm ProfileForm */
+/* @var $profileForm UserForm */
 /* @var $changePasswordForm ChangePasswordForm */
 
 $this->title = Yii::t('user', 'Your profile');
@@ -21,11 +22,34 @@ $this->title = Yii::t('user', 'Your profile');
         'enableAjaxValidation' => true,
         'enableClientValidation' => true,
         'validateOnBlur' => false,
+        'options' => [
+            'enctype' => 'multipart/form-data',
+        ]
     ]);
     ?>
     <div class="panel-body">
         <?= $form->field($profileForm, 'email')->staticControl() ?>
         <?= $form->field($profileForm, 'name')->textInput() ?>
+        <?php if ($avatarUrl = $profileForm->getAvatarUrl()):?>
+            <?php
+            $img = UserAvatar::widget([
+                'user' => $profileForm,
+                'size' => 'normal',
+                'asBlock' => true,
+            ]);
+            $deleteField = $form->field($profileForm, 'deleteAvatar')->checkbox();
+
+            $field = $form->field($profileForm, 'uploadedAvatar', [
+                'template' => '{label}{img}{checkbox}{input}{error}',
+            ])->fileInput();
+            $field->parts['{img}'] = $img;
+            $field->parts['{checkbox}'] = $deleteField;
+
+            echo $field;
+            ?>
+        <?php else:?>
+            <?= $form->field($profileForm, 'uploadedAvatar')->fileInput() ?>
+        <?php endif;?>
     </div>
     <div class="panel-footer">
         <?= Html::submitButton(Yii::t('user', 'Change'), ['class' => 'btn btn-primary']) ?>

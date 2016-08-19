@@ -4,13 +4,14 @@ namespace user;
 use Exception;
 use user\components\Auth;
 use user\models\ChangePasswordForm;
-use user\models\ProfileForm;
 use user\models\User;
+use user\models\UserAccount;
 use user\models\UserAccountForm;
 use user\models\UserChecker;
 use user\models\UserForm;
 use Yii;
 use yii\base\Module as BaseModule;
+use yii\db\ActiveQuery;
 use yii\db\Connection;
 use yii\helpers\Url;
 use yii\rbac\Assignment;
@@ -204,33 +205,6 @@ class UserModule extends BaseModule
         ->setTo($user->email)
         ->setSubject(Yii::t('user', 'Forgot password'))
         ->send();
-    }
-
-    /**
-     * Change user's profile from form.
-     * TODO: implements avatars and e-mail change (?).
-     *
-     * @param ProfileForm $form
-     * @param User $user
-     * @return boolean
-     */
-    public function changeUserProfile(ProfileForm $form, User $user)
-    {
-        if (!$form->validate()) {
-            // form is not valid
-            return false;
-        }
-
-        $user->name = $form->name;
-        try {
-            if (!$user->save()) {
-                throw new Exception();
-            }
-        } catch (Exception $ex) {
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -502,5 +476,37 @@ class UserModule extends BaseModule
         }
 
         return $success;
+    }
+
+    /**
+     * Retreive user model by user VCS bind account (UserAccount model).
+     *
+     * @see UserAccount
+     * @see User
+     *
+     * @param string $vcsType VCS type (git, hg, etc.)
+     * @param string $contributorName VCS contributor name (e.g. commiter name)
+     * @param string $contributorEmail VCS contributor e-mail (e.g. commiter e-mail, if exists)
+     *
+     * @return User|null Returns user model if it exists
+     */
+    public function getUserByUsername($vcsType, $contributorName, $contributorEmail = null)
+    {
+        /* @var $res ActiveQuery */
+        $res = User::find()
+            ->joinWith('accounts')
+            ->orWhere([
+                UserAccount::tableName() . '.username' => $contributorName,
+                UserAccount::tableName() . '.type' => $vcsType
+            ]);
+        if (!empty($contributorEmail)) {
+            $res->orWhere([
+                User::tableName() . '.email' => $contributorEmail
+            ]);
+        }
+
+        $res->groupBy(User::tableName() . '.id');
+
+        return $res->one();
     }
 }

@@ -1,6 +1,5 @@
 <?php
 
-use user\widgets\ContributorLine;
 use VcsCommon\BaseCommit;
 use VcsCommon\BaseDiff;
 use yii\helpers\Html;
@@ -12,15 +11,6 @@ use yii\web\View;
 /* @var $path string */
 /* @var $commit BaseCommit */
 ?>
-
-<p class="diff-description">
-    <strong><?= Yii::t('project', 'Author') ?>:</strong>
-    <?= ContributorLine::widget([
-        'contributorName' => $commit->contributorName,
-        'contributorEmail' => $commit->contributorEmail,
-    ]) ?><br />
-</p>
-
 <table class="diff-table">
     <?php foreach ($diffs as $diff):?>
         <?php foreach ($diff->getLines() as $description => $group):?>

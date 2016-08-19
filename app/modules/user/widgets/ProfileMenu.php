@@ -28,7 +28,7 @@ class ProfileMenu extends Nav
         $this->items = [
             [
                 'url' => ['/user/profile/index'],
-                'label' => Yii::t('user', 'Common settings and password'),
+                'label' => Yii::t('user', 'Common settings'),
             ],
             [
                 'url' => ['/user/profile/vcs-bindings'],

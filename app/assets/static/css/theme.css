@@ -102,3 +102,31 @@ table.table > tbody > tr:hover {
 .project-tree-file-links {
     width: 150px;
 }
+
+.avatar {
+    background: #fff url("../img/avatar-placeholder.png") no-repeat 0 0;
+    background-size: cover;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: middle;
+    border: #e2e2e2 solid 2px;
+    border-radius: 50%;
+    margin-right: 5px;
+    width: 150px;
+    height: 150px;
+}
+.avatar.avatar-block {
+    display: block;
+}
+.avatar img {
+    width: 100%;
+    height: 100%;
+}
+.avatar.avatar-middle {
+    width: 50px;
+    height: 50px;
+}
+.avatar.avatar-small {
+    width: 20px;
+    height: 20px;
+}

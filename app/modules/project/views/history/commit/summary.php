@@ -20,29 +20,28 @@ use yii\web\View;
 
 <h4><?=Html::encode($commit->message)?></h4>
 
-<p>
-    <strong><?=Yii::t('project', 'Author')?>:</strong>
+<div class="alert alert-info">
+    <strong><?=Html::encode($commit->getId())?></strong>
+    <?php if (($parents = $commit->getParentsId()) !== false):?>
+        (<?= Yii::t('project', 'parents') ?>: <?= implode(', ', array_map(function($parentId) use ($project) {
+            return Html::a(
+                $parentId,
+                [
+                    'commit-summary',
+                    'id' => $project->getPrimaryKey(),
+                    'commitId' => $parentId,
+                ]
+            );
+        }, $commit->getParentsId())) ?>)
+    <?php endif;?>
+    <br />
     <?= ContributorLine::widget([
         'contributorName' => $commit->contributorName,
         'contributorEmail' => $commit->contributorEmail,
+        'vcsType' => $project->repo_type,
     ]) ?>
-    <br />
-    <strong><?= Yii::t('project', 'Date') ?>:</strong>
-    <?= Html::encode($commit->getDate()->format("d\'M y H:i:s")) ?><br />
-    <strong><?=Yii::t('project', 'Revision')?>:</strong>
-    <?=Html::encode($commit->getId())?><br />
-    <strong><?=Yii::t('project', 'Parent revision')?>:</strong>
-    <?= implode('<br />', array_map(function($parentId) use ($project) {
-        return Html::a(
-            $parentId,
-            [
-                'commit-summary',
-                'id' => $project->getPrimaryKey(),
-                'commitId' => $parentId,
-            ]
-        );
-    }, $commit->getParentsId())) ?><br />
-</p>
+    <?= Yii::t('project', 'at') ?> <?= Html::encode($commit->getDate()->format("d\'M y H:i:s")) ?>
+</div>
 
 <h5><?=Yii::t('project', 'Changed files')?>:</h5>
 

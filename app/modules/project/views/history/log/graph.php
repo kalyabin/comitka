@@ -3,11 +3,12 @@
 use app\assets\HistoryGraphAsset;
 use project\models\Project;
 use project\widgets\ProjectPanel;
+use user\widgets\ContributorLine;
 use VcsCommon\BaseBranch;
 use VcsCommon\BaseCommit;
-use VcsCommon\Graph;
 use yii\bootstrap\Html;
 use yii\data\Pagination;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\web\View;
 use yii\widgets\LinkPager;
@@ -20,7 +21,7 @@ use yii\widgets\LinkPager;
 
 // register client script
 HistoryGraphAsset::register($this, [
-    'commits' => array_values(yii\helpers\ArrayHelper::map($history, 'id', function($data) {
+    'commits' => array_values(ArrayHelper::map($history, 'id', function($data) {
         /* @var $data BaseCommit */
         return [
             'id' => $data->getId(),
@@ -44,16 +45,16 @@ HistoryGraphAsset::register($this, [
             <div class="col-md-2">
                 <span class="commit-date"><?=$commit->getDate()->format('d\'M y H:i:s')?></span>
             </div>
+            <div class="col-md-3">
+                <?= ContributorLine::widget([
+                    'contributorName' => $commit->contributorName,
+                    'vcsType' => $project->repo_type,
+                    'avatarSize' => 'small',
+                    'useLink' => false,
+                ]) ?>
+            </div>
             <div class="col-md-7 commit-message">
                 <strong class="list-group-item-heading"><?=Html::encode($commit->message)?></strong>
-            </div>
-            <div class="col-md-3">
-                <span class="commit-contributor">
-                    <?=Html::encode($commit->contributorName)?>
-                    <?php if ($commit->contributorEmail && false):?>
-                        &lt;<?=Html::encode($commit->contributorEmail)?>&gt;
-                    <?php endif;?>
-                </span>
             </div>
         </a>
     <?php endforeach;?>

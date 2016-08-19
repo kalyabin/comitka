@@ -9,7 +9,8 @@
         "yiisoft/yii2-faker": "*",
         "kalyabin/yii2-git-view": "*",
         "kalyabin/yii2-hg-view": "*",
-        "DmitryBaranovskiy/raphael": "^2.0"
+        "DmitryBaranovskiy/raphael": "^2.0",
+        "yiisoft/yii2-imagine": "~2.0.0"
     },
     "extra": {
         "asset-installer-paths": {
