@@ -34,6 +34,7 @@ if (isset($localParams['smtp'])) {
 
 $config = ArrayHelper::merge([
     'basePath' => dirname(__DIR__),
+    'vendorPath' => realpath(dirname(__DIR__) . '/../vendor'),
     'sourceLanguage' => 'en-US',
     'bootstrap' => ['log'],
     'aliases' => ArrayHelper::merge([

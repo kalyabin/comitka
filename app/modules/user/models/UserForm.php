@@ -156,6 +156,8 @@ class UserForm extends User
         $image = ImageResizeHelper::cropImage($oldFileName, self::AVATAR_MAX_WIDTH, self::AVATAR_MAX_HEIGHT);
         $image->save($newFileName);
 
+        unlink($this->uploadedAvatar->tempName);
+
         return basename($newFileName);
     }
 

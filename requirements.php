@@ -18,6 +18,7 @@ if (!is_dir($frameworkPath)) {
     echo '<p><strong>The path to yii framework seems to be incorrect.</strong></p>';
     echo '<p>You need to install Yii framework via composer or adjust the framework path in file <abbr title="' . __FILE__ . '">' . basename(__FILE__) . '</abbr>.</p>';
     echo '<p>Please refer to the <abbr title="' . dirname(__FILE__) . '/README.md">README</abbr> on how to install Yii.</p>';
+    die();
 }
 
 require_once($frameworkPath . '/requirements/YiiRequirementChecker.php');
@@ -46,7 +47,7 @@ if (extension_loaded('gd')) {
 }
 
 /**
- * Adjust requirements according to your application specifics.
+ * Adjust requirements according to application specifics.
  */
 $requirements = array(
     // Database :
@@ -57,28 +58,19 @@ $requirements = array(
         'by' => 'All DB-related classes',
     ),
     array(
-        'name' => 'PDO SQLite extension',
-        'mandatory' => false,
-        'condition' => extension_loaded('pdo_sqlite'),
-        'by' => 'All DB-related classes',
-        'memo' => 'Required for SQLite database.',
-    ),
-    array(
         'name' => 'PDO MySQL extension',
-        'mandatory' => false,
+        'mandatory' => true,
         'condition' => extension_loaded('pdo_mysql'),
         'by' => 'All DB-related classes',
         'memo' => 'Required for MySQL database.',
     ),
-    // CAPTCHA:
     array(
         'name' => 'GD PHP extension with FreeType support',
-        'mandatory' => false,
+        'mandatory' => true,
         'condition' => $gdOK,
-        'by' => '<a href="http://www.yiiframework.com/doc-2.0/yii-captcha-captcha.html">Captcha</a>',
+        'by' => 'Image support',
         'memo' => $gdMemo,
     ),
-    // PHP ini :
     'phpExposePhp' => array(
         'name' => 'Expose PHP',
         'mandatory' => false,
@@ -93,12 +85,13 @@ $requirements = array(
         'by' => 'Security reasons',
         'memo' => '"allow_url_include" should be disabled at php.ini',
     ),
-    'phpSmtp' => array(
-        'name' => 'PHP mail SMTP',
-        'mandatory' => false,
-        'condition' => strlen(ini_get('SMTP'))>0,
-        'by' => 'Email sending',
-        'memo' => 'PHP mail SMTP server required',
-    ),
+    'phpCmd' => array(
+        'name' => 'PHP allow open a pipe to console processes',
+        'mandatory' => true,
+        'condition' => in_array('popen', get_defined_functions()['internal']) && in_array('pclose', get_defined_functions()['internal']),
+        'by' => 'Console support',
+        'memo' => '"disable_functions" should not contains popen and pclose functions at php.init',
+    )
 );
+
 $requirementsChecker->checkYii()->check($requirements)->render();

@@ -5,14 +5,15 @@
 
 use yii\web\Application;
 
-$appDir = dirname(__DIR__) . '/app';
+$rootDir = dirname(__DIR__);
+$appDir = $rootDir . '/app';
 
 // include environment constants
 include_once $appDir . '/config/env.php';
 // include vendors autoload
-include $appDir . '/vendor/autoload.php';
+include $rootDir . '/vendor/autoload.php';
 // include yii2 application manually
-include $appDir . '/vendor/yiisoft/yii2/Yii.php';
+include $rootDir . '/vendor/yiisoft/yii2/Yii.php';
 // get frontend configuration
 $config = include $appDir . '/config/frontend.php';
 // run application
