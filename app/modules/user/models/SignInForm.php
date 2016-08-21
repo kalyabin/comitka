@@ -33,6 +33,7 @@ class SignInForm extends Model
         return [
             [['email', 'password'], 'required'],
             [['email', 'password'], 'string'],
+            ['email', 'email'],
             ['email', 'filter', 'filter' => 'strtolower'],
             ['password', 'validatePassword'],
         ];
@@ -59,7 +60,7 @@ class SignInForm extends Model
     {
         $this->user = null;
 
-        if (!$this->getErrors()) {
+        if (!$this->hasErrors()) {
             $this->user = User::findByUsername($this->email);
             if (!($this->user instanceof User)) {
                 // user not found

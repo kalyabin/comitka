@@ -7,8 +7,9 @@ defined('STDIN') or define('STDIN', fopen('php://stdin', 'r'));
 defined('STDOUT') or define('STDOUT', fopen('php://stdout', 'w'));
 
 defined('YII_APP_BASE_PATH') or define('YII_APP_BASE_PATH', dirname(dirname(dirname(__DIR__))));
+defined('VENDOR_BASE_PATH') or define('VENDOR_BASE_PATH', realpath(YII_APP_BASE_PATH . '/../vendor'));
 
-require(YII_APP_BASE_PATH . '/vendor/autoload.php');
-require(YII_APP_BASE_PATH . '/vendor/yiisoft/yii2/Yii.php');
+require(VENDOR_BASE_PATH . '/autoload.php');
+require(VENDOR_BASE_PATH . '/yiisoft/yii2/Yii.php');
 
 Yii::setAlias('@tests', dirname(dirname(__DIR__)));

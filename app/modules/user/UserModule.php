@@ -120,10 +120,16 @@ class UserModule extends BaseModule
      * @param User $user user's identity object
      * @param string $password user's password to validate
      * @param integer $duration login duration at seconds
+     * @param boolean $testOnly Check if user can sign in with provided password
+     *
      * @return boolean
      */
-    public function signInUser(User $user, $password, $duration = null)
+    public function signInUser(User $user, $password, $duration = null, $testOnly = false)
     {
+        if ($testOnly) {
+            return $user->canSignIn() && $this->checkUserPassword($user, $password);
+        }
+
         if (is_null($duration)) {
             $duration = 24*60*60*30*24;
         }
@@ -146,9 +152,6 @@ class UserModule extends BaseModule
      */
     public function findUserByChecker($checkerName, $checkerValue)
     {
-        $checkerName = (string) $checkerName;
-        $checkerValue = (string) $checkerValue;
-
         return User::find()
             ->joinWith('checker')
             ->andWhere([UserChecker::tableName() . '.' . $checkerName => $checkerValue])
@@ -163,7 +166,7 @@ class UserModule extends BaseModule
      * @return string|null
      * @throws Exception
      */
-    protected function getUserChecker(User $user, $field = 'email_checker')
+    public function getUserChecker(User $user, $field = 'email_checker')
     {
         $checker = $user->checker;
         if (!trim($checker->{$field})) {
@@ -354,10 +357,11 @@ class UserModule extends BaseModule
     /**
      * Activate user
      *
-     * @param UserForm $user
+     * @param User $user
+     *
      * @return boolean
      */
-    public function activateUser(UserForm $user)
+    public function activateUser(User $user)
     {
         if ($user->isNewRecord) {
             return false;
@@ -370,10 +374,11 @@ class UserModule extends BaseModule
     /**
      * Lock user
      *
-     * @param UserForm $user
+     * @param User $user
+     *
      * @return boolean
      */
-    public function lockUser(UserForm $user)
+    public function lockUser(User $user)
     {
         if ($user->isNewRecord) {
             return false;

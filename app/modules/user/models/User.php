@@ -6,8 +6,8 @@ use user\UserModule;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\rbac\DbManager;
 use yii\web\IdentityInterface;
-use yii\web\UploadedFile;
 
 /**
  * Model of user and identity class.
@@ -267,5 +267,18 @@ class User extends ActiveRecord implements IdentityInterface
     public function getAvatarUrl()
     {
         return is_file(Yii::getAlias(self::AVATAR_PATH . $this->avatar)) ? self::AVATAR_URL . $this->avatar : null;
+    }
+
+    /**
+     * Get user roles
+     *
+     * @return string[]
+     */
+    public function getUserRoles()
+    {
+        /* @var $authManager DbManager */
+        $authManager = Yii::$app->authManager;
+
+        return array_keys($authManager->getRolesByUser($this->id));
     }
 }

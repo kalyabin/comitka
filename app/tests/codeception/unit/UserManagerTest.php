@@ -2,6 +2,7 @@
 
 use svk\tests\StaticAppTestCase;
 use user\models\ChangePasswordForm;
+use user\models\SignInForm;
 use user\models\User;
 use user\models\UserAccount;
 use user\models\UserAccountForm;
@@ -14,6 +15,7 @@ use user\UserModule;
 class UserManagerTest extends StaticAppTestCase
 {
     use svk\tests\StaticTransactionalTrait;
+    use svk\tests\ModelTestTrait;
 
     /**
      * @var UnitTester
@@ -35,6 +37,216 @@ class UserManagerTest extends StaticAppTestCase
     public static function tearDownAfterClass()
     {
         self::rollBackStaticTransaction();
+    }
+
+    /**
+     * Tests create simple admin user
+     *
+     * @return User
+     */
+    public function testCreateAdmin()
+    {
+        $user = new User();
+
+        $user->email = 'admin@comitka.test';
+        $user->name = 'Testing admin';
+        $user->newPassword = 'testing admin password';
+
+        $this->assertInstanceOf(User::className(), self::$userModule->createAdmin($user));
+        $this->assertFalse($user->isNewRecord);
+        $this->assertNotEmpty($user->id);
+        $this->assertContains('admin', $user->getUserRoles());
+
+        return $user;
+    }
+
+    /**
+     * Tests update user roles
+     *
+     * @depends testCreateAdmin
+     *
+     * @param User $user
+     *
+     * @return User
+     */
+    public function testUpdateUserRoles(User $user)
+    {
+        $this->assertTrue(self::$userModule->updateUserRoles($user, []));
+        $this->assertEmpty($user->getUserRoles());
+        $this->assertTrue(self::$userModule->updateUserRoles($user, ['admin']));
+        $this->assertContains('admin', $user->getUserRoles());
+
+        return $user;
+    }
+
+    /**
+     * Tests check user password
+     *
+     * @depends testCreateAdmin
+     *
+     * @param User $user
+     *
+     * @return User
+     */
+    public function testCheckUserPassword(User $user)
+    {
+        $this->assertTrue(self::$userModule->checkUserPassword($user, 'testing admin password'));
+        $this->assertFalse(self::$userModule->checkUserPassword($user, '123123'));
+
+        return $user;
+    }
+
+    /**
+     * Tests get user checker
+     *
+     * @depends testCreateAdmin
+     *
+     * @param User $user
+     *
+     * @return User
+     */
+    public function testUserChecker(User $user)
+    {
+        $checkString = self::$userModule->getUserChecker($user);
+        $this->assertNotEmpty($checkString);
+        $this->assertInternalType('string', $checkString);
+
+        // confirm retrieve email checker
+        unset ($user->checker);
+
+        $newCheckString = self::$userModule->getUserChecker($user);
+        $this->assertEquals($newCheckString, $checkString);
+
+        $testUser = self::$userModule->findUserByChecker('email_checker', $newCheckString);
+        $this->assertInstanceOf(User::className(), $testUser);
+        $this->assertEquals($testUser->id, $user->id);
+
+        return $user;
+    }
+
+    /**
+     * Test change user password
+     *
+     * @depends testUserChecker
+     *
+     * @param User $user
+     *
+     * @return User
+     */
+    public function testChangeUserPassword(User $user)
+    {
+        // e-mail checker will not to be set to null after change password
+        $this->assertNotEmpty($user->checker->email_checker);
+
+        $model = new ChangePasswordForm();
+
+        $model->password = $model->confirmPassword = 'admin testing password';
+
+        $this->assertTrue(self::$userModule->changeUserPassword($model, $user));
+        // test if new password set
+        $this->assertTrue(self::$userModule->checkUserPassword($user, $model->password));
+
+        $this->assertNotEmpty($user->checker->email_checker);
+
+        return $user;
+    }
+
+    /**
+     * Test change user forgotten password
+     *
+     * @depends testChangeUserPassword
+     *
+     * @param User $user
+     *
+     * @return User
+     */
+    public function testChangeUserForgottenPassword(User $user)
+    {
+        // e-mail checker will be set to null after change password
+        $this->assertNotEmpty($user->checker->email_checker);
+
+        $model = new ChangePasswordForm();
+        $model->password = $model->confirmPassword = 'new admin password';
+
+        $this->assertTrue(self::$userModule->changeUserForgottenPassword($model, $user));
+
+        // test if checker has been removed
+        $this->assertEmpty($user->checker->email_checker);
+        // test if new password set
+        $this->assertTrue(self::$userModule->checkUserPassword($user, $model->password));
+
+        return $user;
+    }
+
+    /**
+     * Test sign in
+     *
+     * @depends testChangeUserForgottenPassword
+     *
+     * @param User $user
+     *
+     * @return User
+     */
+    public function testSignIn(User $user)
+    {
+        $model = new SignInForm();
+
+        $attributes = [
+            'email' => [
+                [
+                    'value' => null,
+                    'isValid' => false
+                ],
+                [
+                    'value' => 0,
+                    'isValid' => false
+                ],
+                [
+                    'value' => '',
+                    'isValid' => false
+                ],
+                [
+                    'value' => 'wrong e-mail',
+                    'isValid' => false
+                ],
+                [
+                    'value' => $user->email,
+                    'isValid' => true,
+                ]
+            ],
+            'password' => [
+                [
+                    'value' => null,
+                    'isValid' => false,
+                ],
+                [
+                    'value' => 0,
+                    'isValid' => false,
+                ],
+                [
+                    'value' => 'wrong user password',
+                    'isValid' => false,
+                ],
+                [
+                    'value' => 'new admin password',
+                    'isValid' => true,
+                ]
+            ],
+        ];
+        $this->validateAttributes($model, $attributes);
+
+        // locked user can't sign in
+        $this->assertTrue(self::$userModule->lockUser($user));
+        $this->assertFalse($model->validate());
+
+        $this->assertTrue(self::$userModule->activateUser($user));
+        $this->assertTrue($model->validate());
+
+        $this->assertInstanceOf(User::className(), $model->getUser());
+
+        $this->assertTrue(self::$userModule->signInUser($model->getUser(), $model->password, null, true));
+
+        return $user;
     }
 
     /**
@@ -158,7 +370,7 @@ class UserManagerTest extends StaticAppTestCase
      * @param User $user
      * @return User
      *
-     * @depends testUpdateUser
+     * @depends testLockUser
      */
     public function testActivateUser(User $user)
     {
@@ -202,6 +414,11 @@ class UserManagerTest extends StaticAppTestCase
         $this->assertTrue(self::$userModule->updateVcsBindings($user, $accounts));
 
         $this->assertEquals(1, count($user->accounts));
+
+        $getByName = self::$userModule->getUserByUsername(UserAccount::TYPE_HG, 'testing user name hg');
+
+        $this->assertInstanceOf(User::className(), $getByName);
+        $this->assertEquals($getByName->id, $user->id);
 
         return $user;
     }
