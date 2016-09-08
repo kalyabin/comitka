@@ -497,21 +497,30 @@ class UserModule extends BaseModule
      */
     public function getUserByUsername($vcsType, $contributorName, $contributorEmail = null)
     {
-        /* @var $res ActiveQuery */
-        $res = User::find()
-            ->joinWith('accounts')
-            ->orWhere([
-                UserAccount::tableName() . '.username' => $contributorName,
-                UserAccount::tableName() . '.type' => $vcsType
-            ]);
-        if (!empty($contributorEmail)) {
-            $res->orWhere([
-                User::tableName() . '.email' => $contributorEmail
-            ]);
+        /* @var $cached User[] */
+        static $cached = [];
+
+        $cacheKey = $vcsType . '_' . $contributorName . '_' . $contributorEmail;
+
+        if (!isset($cached[$cacheKey])) {
+            /* @var $res ActiveQuery */
+            $res = User::find()
+                ->joinWith('accounts')
+                ->orWhere([
+                    UserAccount::tableName() . '.username' => $contributorName,
+                    UserAccount::tableName() . '.type' => $vcsType
+                ]);
+            if (!empty($contributorEmail)) {
+                $res->orWhere([
+                    User::tableName() . '.email' => $contributorEmail
+                ]);
+            }
+
+            $res->groupBy(User::tableName() . '.id');
+
+            $cached[$cacheKey] = $res->one();
         }
 
-        $res->groupBy(User::tableName() . '.id');
-
-        return $res->one();
+        return $cached[$cacheKey];
     }
 }
