@@ -46,6 +46,7 @@ class ContributionReview extends ActiveRecord
             [['date'], 'date', 'format' => 'yyyy-MM-dd HH:mm:ss', 'type' => DateValidator::TYPE_DATETIME],
             [['commit_id'], 'string', 'max' => 40],
             [['commit_id'], 'unique', 'targetAttribute' => ['commit_id', 'project_id']],
+            [['contributor_id', 'reviewer_id'], 'default', 'value' => null],
         ];
     }
 
