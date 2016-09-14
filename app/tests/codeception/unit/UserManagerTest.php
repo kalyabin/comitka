@@ -1,6 +1,7 @@
 <?php
 
-use svk\tests\StaticAppTestCase;
+use Codeception\Test\Unit;
+use tests\codeception\fixtures\UserFixture;
 use user\models\ChangePasswordForm;
 use user\models\SignInForm;
 use user\models\User;
@@ -11,12 +12,11 @@ use user\UserModule;
 
 /**
  * Test user manager: create user, update user and remove him
+ *
+ * @method User users(string $userKey) Get user fixture
  */
-class UserManagerTest extends StaticAppTestCase
+class UserManagerTest extends Unit
 {
-    use svk\tests\StaticTransactionalTrait;
-    use svk\tests\ModelTestTrait;
-
     /**
      * @var UnitTester
      */
@@ -25,18 +25,18 @@ class UserManagerTest extends StaticAppTestCase
     /**
      * @var UserModule
      */
-    protected static $userModule;
+    protected $userModule;
 
-    public static function setUpBeforeClass()
+    /**
+     * @inheritdoc
+     */
+    public function setUp()
     {
-        self::beginStaticTransaction();
-
-        self::$userModule = Yii::$app->getModule('user');
-    }
-
-    public static function tearDownAfterClass()
-    {
-        self::rollBackStaticTransaction();
+        parent::setUp();
+        $this->getModule('Yii2')->haveFixtures([
+            'users' => UserFixture::className(),
+        ]);
+        $this->userModule = Yii::$app->getModule('user');
     }
 
     /**
@@ -52,7 +52,7 @@ class UserManagerTest extends StaticAppTestCase
         $user->name = 'Testing admin';
         $user->newPassword = 'testing admin password';
 
-        $this->assertInstanceOf(User::className(), self::$userModule->createAdmin($user));
+        $this->assertInstanceOf(User::className(), $this->userModule->createAdmin($user));
         $this->assertFalse($user->isNewRecord);
         $this->assertNotEmpty($user->id);
         $this->assertContains('admin', $user->getUserRoles());
@@ -65,15 +65,15 @@ class UserManagerTest extends StaticAppTestCase
      *
      * @depends testCreateAdmin
      *
-     * @param User $user
-     *
      * @return User
      */
-    public function testUpdateUserRoles(User $user)
+    public function testUpdateUserRoles()
     {
-        $this->assertTrue(self::$userModule->updateUserRoles($user, []));
+        /* @var $user User */
+        $user = $this->getModule('Yii2')->grabFixture('users', 'activeUser1');
+        $this->assertTrue($this->userModule->updateUserRoles($user, []));
         $this->assertEmpty($user->getUserRoles());
-        $this->assertTrue(self::$userModule->updateUserRoles($user, ['admin']));
+        $this->assertTrue($this->userModule->updateUserRoles($user, ['admin']));
         $this->assertContains('admin', $user->getUserRoles());
 
         return $user;
@@ -84,14 +84,15 @@ class UserManagerTest extends StaticAppTestCase
      *
      * @depends testCreateAdmin
      *
-     * @param User $user
-     *
      * @return User
      */
-    public function testCheckUserPassword(User $user)
+    public function testCheckUserPassword()
     {
-        $this->assertTrue(self::$userModule->checkUserPassword($user, 'testing admin password'));
-        $this->assertFalse(self::$userModule->checkUserPassword($user, '123123'));
+        /* @var $user User */
+        $user = $this->getModule('Yii2')->grabFixture('users', 'activeUser1');
+
+        $this->assertTrue($this->userModule->checkUserPassword($user, 'password_active_user_1'));
+        $this->assertFalse($this->userModule->checkUserPassword($user, '123123'));
 
         return $user;
     }
@@ -101,23 +102,24 @@ class UserManagerTest extends StaticAppTestCase
      *
      * @depends testCreateAdmin
      *
-     * @param User $user
-     *
      * @return User
      */
-    public function testUserChecker(User $user)
+    public function testUserChecker()
     {
-        $checkString = self::$userModule->getUserChecker($user);
+        /* @var $user User */
+        $user = $this->getModule('Yii2')->grabFixture('users', 'activeUser1');
+
+        $checkString = $this->userModule->getUserChecker($user);
         $this->assertNotEmpty($checkString);
         $this->assertInternalType('string', $checkString);
 
         // confirm retrieve email checker
         unset ($user->checker);
 
-        $newCheckString = self::$userModule->getUserChecker($user);
+        $newCheckString = $this->userModule->getUserChecker($user);
         $this->assertEquals($newCheckString, $checkString);
 
-        $testUser = self::$userModule->findUserByChecker('email_checker', $newCheckString);
+        $testUser = $this->userModule->findUserByChecker('email_checker', $newCheckString);
         $this->assertInstanceOf(User::className(), $testUser);
         $this->assertEquals($testUser->id, $user->id);
 
@@ -129,12 +131,17 @@ class UserManagerTest extends StaticAppTestCase
      *
      * @depends testUserChecker
      *
-     * @param User $user
-     *
      * @return User
      */
     public function testChangeUserPassword(User $user)
     {
+        /* @var $user User */
+        $user = $this->getModule('Yii2')->grabFixture('users', 'activeUser1');
+
+        $checkString = $this->userModule->getUserChecker($user);
+        $this->assertNotEmpty($checkString);
+        $this->assertInternalType('string', $checkString);
+
         // e-mail checker will not to be set to null after change password
         $this->assertNotEmpty($user->checker->email_checker);
 
@@ -142,9 +149,9 @@ class UserManagerTest extends StaticAppTestCase
 
         $model->password = $model->confirmPassword = 'admin testing password';
 
-        $this->assertTrue(self::$userModule->changeUserPassword($model, $user));
+        $this->assertTrue($this->userModule->changeUserPassword($model, $user));
         // test if new password set
-        $this->assertTrue(self::$userModule->checkUserPassword($user, $model->password));
+        $this->assertTrue($this->userModule->checkUserPassword($user, $model->password));
 
         $this->assertNotEmpty($user->checker->email_checker);
 
@@ -156,24 +163,29 @@ class UserManagerTest extends StaticAppTestCase
      *
      * @depends testChangeUserPassword
      *
-     * @param User $user
-     *
      * @return User
      */
-    public function testChangeUserForgottenPassword(User $user)
+    public function testChangeUserForgottenPassword()
     {
+        /* @var $user User */
+        $user = $this->getModule('Yii2')->grabFixture('users', 'activeUser1');
+
+        $checkString = $this->userModule->getUserChecker($user);
+        $this->assertNotEmpty($checkString);
+        $this->assertInternalType('string', $checkString);
+
         // e-mail checker will be set to null after change password
         $this->assertNotEmpty($user->checker->email_checker);
 
         $model = new ChangePasswordForm();
         $model->password = $model->confirmPassword = 'new admin password';
 
-        $this->assertTrue(self::$userModule->changeUserForgottenPassword($model, $user));
+        $this->assertTrue($this->userModule->changeUserForgottenPassword($model, $user));
 
         // test if checker has been removed
         $this->assertEmpty($user->checker->email_checker);
         // test if new password set
-        $this->assertTrue(self::$userModule->checkUserPassword($user, $model->password));
+        $this->assertTrue($this->userModule->checkUserPassword($user, $model->password));
 
         return $user;
     }
@@ -183,12 +195,13 @@ class UserManagerTest extends StaticAppTestCase
      *
      * @depends testChangeUserForgottenPassword
      *
-     * @param User $user
-     *
      * @return User
      */
     public function testSignIn(User $user)
     {
+        /* @var $user User */
+        $user = $this->getModule('Yii2')->grabFixture('users', 'activeUser1');
+
         $model = new SignInForm();
 
         $attributes = [
@@ -228,23 +241,23 @@ class UserManagerTest extends StaticAppTestCase
                     'isValid' => false,
                 ],
                 [
-                    'value' => 'new admin password',
+                    'value' => 'password_active_user_1',
                     'isValid' => true,
                 ]
             ],
         ];
-        $this->validateAttributes($model, $attributes);
+        $this->getModule('\Helper\Unit')->validateModelAttributes($model, $attributes, $this);
 
         // locked user can't sign in
-        $this->assertTrue(self::$userModule->lockUser($user));
+        $this->assertTrue($this->userModule->lockUser($user));
         $this->assertFalse($model->validate());
 
-        $this->assertTrue(self::$userModule->activateUser($user));
+        $this->assertTrue($this->userModule->activateUser($user));
         $this->assertTrue($model->validate());
 
         $this->assertInstanceOf(User::className(), $model->getUser());
 
-        $this->assertTrue(self::$userModule->signInUser($model->getUser(), $model->password, null, true));
+        $this->assertTrue($this->userModule->signInUser($model->getUser(), $model->password, null, true));
 
         return $user;
     }
@@ -274,13 +287,13 @@ class UserManagerTest extends StaticAppTestCase
         $this->assertTrue($user->validate(), 'Check every field is validated');
 
         // create user model
-        $result = self::$userModule->createUser($user);
+        $result = $this->userModule->createUser($user);
         $this->assertNotEmpty($user->id);
         $this->assertTrue($result, 'User successfully created');
         $this->assertNotEmpty($user->password);
 
         // activate user
-        $foundUser = self::$userModule->findUserByChecker('email_checker', $user->checker->email_checker);
+        $foundUser = $this->userModule->findUserByChecker('email_checker', $user->checker->email_checker);
         $this->assertInstanceOf(User::className(), $foundUser);
         $this->assertEquals($foundUser->id, $user->id);
 
@@ -296,7 +309,7 @@ class UserManagerTest extends StaticAppTestCase
         $this->assertArrayHasKey('confirmPassword', $changePasswordForm->getErrors(), 'Check has confirmPassword error');
         $changePasswordForm->confirmPassword = 'new user password';
         $this->assertTrue($changePasswordForm->validate(), 'Check every field is validated');
-        $result = self::$userModule->changeUserForgottenPassword($changePasswordForm, $foundUser);
+        $result = $this->userModule->changeUserForgottenPassword($changePasswordForm, $foundUser);
         $this->assertTrue($result, 'Password successfully changed');
         $this->assertNull($foundUser->checker->email_checker);
 
@@ -315,12 +328,13 @@ class UserManagerTest extends StaticAppTestCase
     /**
      * Tests user  update form
      *
-     * @param User $user
      * @depends testCreateUser
      */
-    public function testUpdateUser(User $user)
+    public function testUpdateUser()
     {
-        $user = UserForm::findOne($user->id);
+        /* @var $user UserForm */
+        $user = UserForm::findOne($this->getModule('Yii2')->grabFixture('users', 'activeUser1')->id);
+
         $this->assertInstanceOf(UserForm::className(), $user);
 
         $user->setScenario('update');
@@ -336,7 +350,7 @@ class UserManagerTest extends StaticAppTestCase
         // generate new password
         $user->generateRandomPassword = true;
         $user->sendNotification = true;
-        $result = self::$userModule->updateUser($user);
+        $result = $this->userModule->updateUser($user);
         $this->assertTrue($result);
         $this->assertNotEquals($oldPassword, $user->password);
 
@@ -347,34 +361,23 @@ class UserManagerTest extends StaticAppTestCase
     }
 
     /**
-     * Tests update a user
+     * Tests lock a user
      *
-     * @param User $user
      * @return User
      *
      * @depends testUpdateUser
      */
-    public function testLockUser(User $user)
+    public function testLockAndActivate()
     {
-        $result = self::$userModule->lockUser($user);
+        /* @var $user User */
+        $user = $this->getModule('Yii2')->grabFixture('users', 'activeUser1');
+
+        $result = $this->userModule->lockUser($user);
         $this->assertTrue($result);
 
         $this->assertFalse($user->canSignIn());
 
-        return $user;
-    }
-
-    /**
-     * Tests activate a user
-     *
-     * @param User $user
-     * @return User
-     *
-     * @depends testLockUser
-     */
-    public function testActivateUser(User $user)
-    {
-        $result = self::$userModule->activateUser($user);
+        $result = $this->userModule->activateUser($user);
         $this->assertTrue($result);
 
         $this->assertTrue($user->canSignIn());
@@ -385,13 +388,15 @@ class UserManagerTest extends StaticAppTestCase
     /**
      * Tests VCS bindings update
      *
-     * @param User $user
      * @return User
      *
-     * @depends testActivateUser
+     * @depends testLockAndActivate
      */
-    public function testVCSBindings(User $user)
+    public function testVCSBindings()
     {
+        /* @var $user User */
+        $user = $this->getModule('Yii2')->grabFixture('users', 'activeUser1');
+
         $accounts = [
             0 => new UserAccountForm([
                 'username' => 'testing user name git',
@@ -403,7 +408,7 @@ class UserManagerTest extends StaticAppTestCase
             ])
         ];
 
-        $this->assertTrue(self::$userModule->updateVcsBindings($user, $accounts));
+        $this->assertTrue($this->userModule->updateVcsBindings($user, $accounts));
 
         $this->assertEquals(count($accounts), count($user->accounts));
 
@@ -411,11 +416,11 @@ class UserManagerTest extends StaticAppTestCase
 
         $accounts[0]->deletionFlag = true;
 
-        $this->assertTrue(self::$userModule->updateVcsBindings($user, $accounts));
+        $this->assertTrue($this->userModule->updateVcsBindings($user, $accounts));
 
         $this->assertEquals(1, count($user->accounts));
 
-        $getByName = self::$userModule->getUserByUsername(UserAccount::TYPE_HG, 'testing user name hg');
+        $getByName = $this->userModule->getUserByUsername(UserAccount::TYPE_HG, 'testing user name hg');
 
         $this->assertInstanceOf(User::className(), $getByName);
         $this->assertEquals($getByName->id, $user->id);
@@ -426,12 +431,12 @@ class UserManagerTest extends StaticAppTestCase
     /**
      * Tests delete a user
      *
-     * @param User $user
-     *
      * @depends testVCSBindings
      */
-    public function testDeleteUser(User $user)
+    public function testDeleteUser()
     {
+        /* @var $user User */
+        $user = $this->getModule('Yii2')->grabFixture('users', 'activeUser1');
         $result = $user->delete();
         $this->assertEquals(1, $result);
     }

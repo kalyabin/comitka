@@ -8,7 +8,7 @@ use yii\helpers\Json;
 
 $common = include __DIR__ . '/common.php';
 
-return ArrayHelper::merge($common, [
+$config = ArrayHelper::merge($common, [
     'id' => 'frontend',
     'components' => [
         'request' => [
@@ -28,3 +28,11 @@ return ArrayHelper::merge($common, [
         ]
     ],
 ]);
+
+if (defined('YII_ENV_DEV') && YII_ENV_DEV == true) {
+    // configuration adjustments for 'dev' environment
+    $config['bootstrap'][] = 'debug';
+    $config['modules']['debug'] = 'yii\debug\Module';
+}
+
+return $config;

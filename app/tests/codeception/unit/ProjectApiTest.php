@@ -1,22 +1,19 @@
 <?php
 
+use Codeception\Test\Unit;
+use project\models\ContributionReview;
 use project\models\Project;
 use project\ProjectModule;
-use svk\tests\StaticAppTestCase;
 use tests\codeception\fixtures\ProjectFixture;
 use tests\codeception\fixtures\UserFixture;
 use user\models\User;
+use VcsCommon\BaseCommit;
 
 /**
  * Tests project helpers
- *
- * @method User users(string $userKey) Get user fixture
- * @method Project projects(string $projectKey) Get project fixture
  */
-class ProjectApiTest extends StaticAppTestCase
+class ProjectApiTest extends Unit
 {
-    use svk\tests\StaticTransactionalTrait;
-
     /**
      * @var UnitTester
      */
@@ -27,31 +24,14 @@ class ProjectApiTest extends StaticAppTestCase
      */
     protected $projectApi;
 
-    /**
-     * @inheritdoc
-     */
-    public function fixtures()
-    {
-        return [
-            'projects' => ProjectFixture::className(),
-            'users' => UserFixture::className(),
-        ];
-    }
-
     public function setUp()
     {
         parent::setUp();
+        $this->getModule('Yii2')->haveFixtures([
+            'projects' => ProjectFixture::className(),
+            'users' => UserFixture::className(),
+        ]);
         $this->projectApi = Yii::$app->getModule('project');
-    }
-
-    public static function setUpBeforeClass()
-    {
-        self::beginStaticTransaction();
-    }
-
-    public static function tearDownAfterClass()
-    {
-        self::rollBackStaticTransaction();
     }
 
     /**
@@ -62,7 +42,7 @@ class ProjectApiTest extends StaticAppTestCase
     public function testGetProjectContributions()
     {
         /* @var $project Project */
-        $project = $this->projects('comitkaGitProject');
+        $project = $this->getModule('Yii2')->grabFixture('projects', 'comitkaGitProject');
 
         $dateFrom = new DateTime();
 
@@ -70,7 +50,7 @@ class ProjectApiTest extends StaticAppTestCase
         $dateFrom->setTime(0, 0, 0);
 
         $this->assertNotEmpty($this->projectApi->getProjectContributions($project, $dateFrom));
-        $this->assertContainsOnly(VcsCommon\BaseCommit::className(), $this->projectApi->getProjectContributions($project, $dateFrom));
+        $this->assertContainsOnly(BaseCommit::className(), $this->projectApi->getProjectContributions($project, $dateFrom));
 
         // check if not less than date from
         $firstCommit = null;
@@ -88,20 +68,20 @@ class ProjectApiTest extends StaticAppTestCase
      *
      * @depends testGetProjectContributions
      *
-     * @param VcsCommon\BaseCommit $commit
+     * @param BaseCommit $commit
      */
-    public function testCreateContributionReview(VcsCommon\BaseCommit $commit)
+    public function testCreateContributionReview(BaseCommit $commit)
     {
         /* @var $project Project */
-        $project = $this->projects('comitkaGitProject');
+        $project = $this->getModule('Yii2')->grabFixture('projects', 'comitkaGitProject');
         /* @var $reviewer User */
-        $reviewer = $this->users('activeUser1');
+        $reviewer = $this->getModule('Yii2')->grabFixture('users', 'activeUser1');
         /* @var $contributor User */
-        $contributor = $this->users('activeUser2');
+        $contributor = $this->getModule('Yii2')->grabFixture('users', 'activeUser2');
 
         // create review without users
         $contributionReview = $this->projectApi->createContributionReview($project, $commit);
-        $this->assertInstanceOf(\project\models\ContributionReview::className(), $contributionReview);
+        $this->assertInstanceOf(ContributionReview::className(), $contributionReview);
         $this->assertInstanceOf(Project::className(), $contributionReview->project);
         $this->assertEquals($contributionReview->project->id, $project->id);
         $this->assertNull($contributionReview->reviewer);
@@ -115,7 +95,7 @@ class ProjectApiTest extends StaticAppTestCase
 
         // create review with users
         $contributionReview = $this->projectApi->createContributionReview($project, $commit, $contributor->id, $reviewer->id);
-        $this->assertInstanceOf(\project\models\ContributionReview::className(), $contributionReview);
+        $this->assertInstanceOf(ContributionReview::className(), $contributionReview);
         $this->assertInstanceOf(Project::className(), $contributionReview->project);
         $this->assertEquals($contributionReview->project->id, $project->id);
         $this->assertInstanceOf(User::className(), $contributionReview->reviewer);

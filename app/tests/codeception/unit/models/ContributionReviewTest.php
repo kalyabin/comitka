@@ -1,70 +1,36 @@
 <?php
 namespace models;
 
+use Codeception\Test\Unit;
 use project\models\ContributionReview;
-use svk\tests\StaticAppTestCase;
+use project\models\Project;
+use tests\codeception\fixtures\ProjectFixture;
+use tests\codeception\fixtures\UserFixture;
 use UnitTester;
 use user\models\User;
-use project\models\Project;
 
 /**
  * Test ContributionReview model
- *
- * @method User users(string $userKey) Get user fixture
- * @method Project projects(string $projectKey) Get project fixture
  */
-class ContributionReviewTest extends StaticAppTestCase
+class ContributionReviewTest extends Unit
 {
-    use \svk\tests\StaticTransactionalTrait;
-    use \svk\tests\ModelTestTrait;
-
     /**
      * @var UnitTester
      */
     protected $tester;
 
-    /**
-     * @inheritdoc
-     */
-    public function fixtures()
-    {
-        return [
-            'users' => \tests\codeception\fixtures\UserFixture::className(),
-            'projects' => \tests\codeception\fixtures\ProjectFixture::className(),
-        ];
-    }
-
-    public static function setUpBeforeClass()
-    {
-        self::beginStaticTransaction();
-    }
-
-    public static function tearDownAfterClass()
-    {
-        self::rollBackStaticTransaction();
-    }
-
     public function setUp()
     {
-        static $fixturesLoaded = false;
-
-        if (!$fixturesLoaded) {
-            parent::setUp();
-            $fixturesLoaded = true;
-        }
-    }
-
-    public function tearDown()
-    {
-
+        $this->getModule('Yii2')->haveFixtures([
+            'users' => UserFixture::className(),
+            'projects' => ProjectFixture::className(),
+        ]);
     }
 
     /**
      * Test model validation and save
-     *
-     * @return ContributionReview
      */
-    public function testValidationAndSave()
+    public function testValidationSaveAndDelete()
     {
         $model = new ContributionReview();
 
@@ -113,7 +79,7 @@ class ContributionReviewTest extends StaticAppTestCase
                     'isValid' => false,
                 ],
                 [
-                    'value' => $this->projects('comitkaGitProject')->id,
+                    'value' => $this->getModule('Yii2')->grabFixture('projects', 'comitkaGitProject')->id,
                     'isValid' => true,
                 ]
             ],
@@ -165,7 +131,7 @@ class ContributionReviewTest extends StaticAppTestCase
                     'isValid' => false,
                 ],
                 [
-                    'value' => $this->users('activeUser1')->id,
+                    'value' => $this->getModule('Yii2')->grabFixture('users', 'activeUser1')->id,
                     'isValid' => true,
                 ],
             ],
@@ -191,38 +157,53 @@ class ContributionReviewTest extends StaticAppTestCase
                     'isValid' => false,
                 ],
                 [
-                    'value' => $this->users('activeUser2')->id,
+                    'value' => $this->getModule('Yii2')->grabFixture('users', 'activeUser2')->id,
+                    'isValid' => true,
+                ],
+            ],
+            'reviewed' => [
+                [
+                    'value' => null,
+                    'isValid' => true,
+                ],
+                [
+                    'value' => [],
+                    'isValid' => true,
+                ],
+                [
+                    'value' => ['wrong string'],
+                    'isValid' => false,
+                ],
+                [
+                    'value' => 'string',
+                    'isValid' => false,
+                ],
+                [
+                    'value' => 1,
+                    'isValid' => false,
+                ],
+                [
+                    'value' => date('Y-m-d H:i:s'),
                     'isValid' => true,
                 ],
             ],
         ];
 
-        $this->validateAttributes($model, $attributes);
+        $this->getModule('\Helper\Unit')->validateModelAttributes($model, $attributes, $this);
 
         $this->assertTrue($model->validate());
         $this->assertTrue($model->save());
 
-        $this->assertInstanceOf(\project\models\Project::className(), $model->project);
-        $this->assertEquals($model->project->id, $this->projects('comitkaGitProject')->id);
+        $this->assertInstanceOf(Project::className(), $model->project);
+        $this->assertEquals($model->project->id, $this->getModule('Yii2')->grabFixture('projects', 'comitkaGitProject')->id);
 
-        $this->assertInstanceOf(\user\models\User::className(), $model->contributor);
-        $this->assertEquals($model->contributor->id, $this->users('activeUser1')->id);
+        $this->assertInstanceOf(User::className(), $model->contributor);
+        $this->assertEquals($model->contributor->id, $this->getModule('Yii2')->grabFixture('users', 'activeUser1')->id);
 
-        $this->assertInstanceOf(\user\models\User::className(), $model->reviewer);
-        $this->assertEquals($model->reviewer->id, $this->users('activeUser2')->id);
+        $this->assertInstanceOf(User::className(), $model->reviewer);
+        $this->assertEquals($model->reviewer->id, $this->getModule('Yii2')->grabFixture('users', 'activeUser2')->id);
 
-        return $model;
-    }
-
-    /**
-     * Tests unique model
-     *
-     * @depends testValidationAndSave
-     *
-     * @param ContributionReview $model
-     */
-    public function testUniqueModel(ContributionReview $model)
-    {
+        // test unique model
         $attributes = $model->getAttributes();
 
         unset ($attributes['id']);
@@ -234,18 +215,7 @@ class ContributionReviewTest extends StaticAppTestCase
 
         $this->assertArrayHasKey('commit_id', $newModel->getErrors());
 
-        return $model;
-    }
-
-    /**
-     * Tests deletion model
-     *
-     * @depends testUniqueModel
-     *
-     * @param ContributionReview $model
-     */
-    public function testDeleteModel(ContributionReview $model)
-    {
+        // delete test
         $this->assertEquals(1, $model->delete());
     }
 }

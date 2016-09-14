@@ -19,6 +19,7 @@ class m160907_093645_project__contribution_reviews extends Migration
             'contributor_id' => $this->integer()->null()->comment('Contributor user id'),
             'reviewer_id' => $this->integer()->null()->comment('Reviewer user id'),
             'date' => $this->datetime()->notNull()->comment('Contribution date'),
+            'reviewed' => $this->dateTime()->null()->comment('Review date by reviewer'),
         ], "ENGINE=InnoDB CHARACTER SET utf8 COLLATE utf8_unicode_ci COMMENT 'Contributions reviews'");
 
         $this->addPrimaryKey('contribution_review_primary_key', $this->table, ['commit_id', 'project_id']);

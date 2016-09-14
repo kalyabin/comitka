@@ -1,30 +1,19 @@
 <?php
 namespace models;
 
+use Codeception\Test\Unit;
+use UnitTester;
 use user\models\ChangePasswordForm;
 
 /**
  * Test change password form model
  */
-class ChangePasswordFormTest extends \svk\tests\StaticAppTestCase
+class ChangePasswordFormTest extends Unit
 {
-    use \svk\tests\StaticTransactionalTrait;
-    use \svk\tests\ModelTestTrait;
-
     /**
      * @var UnitTester
      */
     protected $tester;
-
-    public static function setUpBeforeClass()
-    {
-        self::beginStaticTransaction();
-    }
-
-    public static function tearDownAfterClass()
-    {
-        self::rollBackStaticTransaction();
-    }
 
     public function testTestMe()
     {
@@ -73,6 +62,6 @@ class ChangePasswordFormTest extends \svk\tests\StaticAppTestCase
             ],
         ];
 
-        $this->validateAttributes($model, $attributes);
+        $this->getModule('\Helper\Unit')->validateModelAttributes($model, $attributes, $this);
     }
 }

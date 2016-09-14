@@ -1,37 +1,30 @@
 <?php
 
+use Codeception\Test\Unit;
 use GitView\Repository as GitRepository;
 use HgView\Repository as HgRepository;
 use project\models\Project;
-use svk\tests\StaticAppTestCase;
+use tests\codeception\fixtures\ProjectFixture;
 
 /**
  * Tests project: create, update, get repository instance and delete
  */
-class ProjectManagerTest extends StaticAppTestCase
+class ProjectManagerTest extends Unit
 {
-    use svk\tests\StaticTransactionalTrait;
-
     /**
      * @var UnitTester
      */
     protected $tester;
 
     /**
-     * @var string path to current repository
+     * @inheritdoc
      */
-    protected static $projectPath;
-
-    public static function setUpBeforeClass()
+    public function setUp()
     {
-        self::beginStaticTransaction();
-
-        self::$projectPath = dirname(YII_APP_BASE_PATH);
-    }
-
-    public static function tearDownAfterClass()
-    {
-        self::rollBackStaticTransaction();
+        parent::setUp();
+        $this->getModule('Yii2')->haveFixtures([
+            'projects' => ProjectFixture::className(),
+        ]);
     }
 
     /**
@@ -106,7 +99,6 @@ class ProjectManagerTest extends StaticAppTestCase
         $this->checkRepoPath($model, Project::REPO_GIT);
 
         $this->assertTrue($model->save());
-        $this->assertFalse($model->isNewRecord);
 
         return $model;
     }
@@ -115,14 +107,13 @@ class ProjectManagerTest extends StaticAppTestCase
      * Test update project
      *
      * @depends testCreateProject
-     * @param Project $project
+     *
      * @return Project
      */
-    public function testUpdateProject(Project $project)
+    public function testUpdateProject()
     {
         /* @var $model Project */
-        $model = Project::findOne($project->id);
-        $this->assertInstanceOf(Project::className(), $model);
+        $model = $this->getModule('Yii2')->grabFixture('projects', 'comitkaGitProject');
 
         $model->title = 'New repo title';
         $this->assertTrue($model->validate());
@@ -135,11 +126,13 @@ class ProjectManagerTest extends StaticAppTestCase
      * Tests get repository object
      *
      * @depends testUpdateProject
-     * @param Project $project
+     *
      * @return Project
      */
-    public function testGetRepository(Project $project)
+    public function testGetRepository()
     {
+        $project = $this->getModule('Yii2')->grabFixture('projects', 'comitkaGitProject');
+
         // change repo path to HG first
         $project->repo_path = Yii::$app->params['testingVariables']['hgProjectPath'];
         $project->repo_type = Project::REPO_HG;
@@ -159,10 +152,10 @@ class ProjectManagerTest extends StaticAppTestCase
      * Tests remove project
      *
      * @depends testGetRepository
-     * @param Project $model
      */
-    public function testRemoveProject(Project $model)
+    public function testRemoveProject()
     {
+        $model = $this->getModule('Yii2')->grabFixture('projects', 'comitkaGitProject');
         $result = $model->delete();
         $this->assertEquals(1, $result);
     }

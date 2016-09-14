@@ -20,6 +20,7 @@ use yii\validators\DateValidator;
  * @property integer $contributor_id Contributor user identifier (null if not detectected)
  * @property integer $reviewer_id Reviewer user identifier (null if not detected)
  * @property string $date Contribution date and time
+ * @property string $reviewed Review date by reviewer
  *
  * @property User $contributor Relation to contributor user model
  * @property User $reviewer Relation to reviewer user model
@@ -43,10 +44,11 @@ class ContributionReview extends ActiveRecord
         return [
             [['commit_id', 'project_id', 'date'], 'required'],
             [['project_id', 'contributor_id', 'reviewer_id'], 'integer'],
-            [['date'], 'date', 'format' => 'yyyy-MM-dd HH:mm:ss', 'type' => DateValidator::TYPE_DATETIME],
+            [['date', 'reviewed'], 'date', 'format' => 'yyyy-MM-dd HH:mm:ss', 'type' => DateValidator::TYPE_DATETIME],
             [['commit_id'], 'string', 'max' => 40],
             [['commit_id'], 'unique', 'targetAttribute' => ['commit_id', 'project_id']],
             [['contributor_id', 'reviewer_id'], 'default', 'value' => null],
+            [['reviewed'], 'default', 'value' => null],
         ];
     }
 
@@ -61,6 +63,7 @@ class ContributionReview extends ActiveRecord
             'contributor_id' => Yii::t('project', 'Contributor user id'),
             'reviewer_id' => Yii::t('project', 'Reviewer user id'),
             'date' => Yii::t('project', 'Date'),
+            'reviewed' => Yii::t('project', 'Review date by reviewer'),
         ];
     }
 

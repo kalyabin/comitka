@@ -1,7 +1,8 @@
 <?php
 namespace models;
 
-use svk\tests\StaticAppTestCase;
+use Codeception\Test\Unit;
+use tests\codeception\fixtures\UserFixture;
 use UnitTester;
 use user\models\User;
 use user\models\UserAccount;
@@ -10,24 +11,22 @@ use user\models\UserChecker;
 /**
  * Test user model
  */
-class UserTest extends StaticAppTestCase
+class UserTest extends Unit
 {
-    use \svk\tests\StaticTransactionalTrait;
-    use \svk\tests\ModelTestTrait;
-
     /**
      * @var UnitTester
      */
     protected $tester;
 
-    public static function setUpBeforeClass()
+    /**
+     * @inheritdoc
+     */
+    public function setUp()
     {
-        self::beginStaticTransaction();
-    }
-
-    public static function tearDownAfterClass()
-    {
-        self::rollBackStaticTransaction();
+        parent::setUp();
+        $this->getModule('Yii2')->haveFixtures([
+            'users' => UserFixture::className(),
+        ]);
     }
 
     /**
@@ -138,37 +137,24 @@ class UserTest extends StaticAppTestCase
             ]
         ];
 
-        $this->validateAttributes($model, $attributes);
+        $this->getModule('\Helper\Unit')->validateModelAttributes($model, $attributes, $this);
 
         $model->newPassword = str_repeat('A', 255);
         $model->password = null;
 
-        $this->validateAttributes($model, [
+        $this->getModule('\Helper\Unit')->validateModelAttributes($model, [
             'password' => [
                 [
                     'value' => null,
                     'isValid' => true,
                 ]
             ]
-        ]);
+        ], $this);
 
         $this->assertTrue($model->validate());
         $this->assertTrue($model->save());
 
-        return $model;
-    }
-
-    /**
-     * Test unique email
-     *
-     * @param User $model
-     *
-     * @depends testValidationAndSave
-     *
-     * @return User
-     */
-    public function testUniqueEmail(User $model)
-    {
+        // test unique e-mail
         $newModel = new User();
 
         $newModel->setAttributes($model->getAttributes());
@@ -182,14 +168,15 @@ class UserTest extends StaticAppTestCase
     /**
      * Test user's checker model
      *
-     * @param User $model
-     *
      * @depends testValidationAndSave
      *
      * @return User
      */
-    public function testUserChecker(User $model)
+    public function testUserChecker()
     {
+        /* @var $model User */
+        $model = $this->getModule('Yii2')->grabFixture('users', 'activeUser1');
+
         $this->assertInstanceOf(UserChecker::className(), $model->checker);
 
         /* @var $checker UserChecker */
@@ -228,7 +215,7 @@ class UserTest extends StaticAppTestCase
             ]
         ];
 
-        $this->validateAttributes($checker, $attributes);
+        $this->getModule('\Helper\Unit')->validateModelAttributes($checker, $attributes, $this);
 
         $this->assertTrue($checker->save());
 
@@ -251,14 +238,15 @@ class UserTest extends StaticAppTestCase
     /**
      * Test user accounts relations
      *
-     * @param User $user
-     *
      * @depends testValidationAndSave
      *
      * @return User
      */
-    public function testUserAccounts(User $user)
+    public function testUserAccounts()
     {
+        /* @var $user User */
+        $user = $this->getModule('Yii2')->grabFixture('users', 'activeUser1');
+
         $model = new UserAccount();
 
         $attributes = [
@@ -334,7 +322,7 @@ class UserTest extends StaticAppTestCase
             ],
         ];
 
-        $this->validateAttributes($model, $attributes);
+        $this->getModule('\Helper\Unit')->validateModelAttributes($model, $attributes, $this);
 
         $this->assertTrue($model->save());
 
@@ -366,12 +354,12 @@ class UserTest extends StaticAppTestCase
     /**
      * Test delete user model
      *
-     * @param User $model
-     *
      * @depends testUserAccounts
      */
-    public function testRemoveUser(User $model)
+    public function testRemoveUser()
     {
+        $model = $this->getModule('Yii2')->grabFixture('users', 'activeUser1');
+
         $this->assertEquals(1, $model->delete());
     }
 }

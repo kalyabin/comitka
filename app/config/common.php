@@ -32,7 +32,7 @@ if (isset($localParams['smtp'])) {
     ], $mailerConfig);
 }
 
-$config = ArrayHelper::merge([
+return ArrayHelper::merge([
     'basePath' => dirname(__DIR__),
     'vendorPath' => realpath(dirname(__DIR__) . '/../vendor'),
     'sourceLanguage' => 'en-US',
@@ -98,11 +98,3 @@ $config = ArrayHelper::merge([
         'local' => $localParams,
     ],
 ], $localCfg);
-
-if (defined('YII_ENV_DEV') && YII_ENV_DEV == true) {
-    // configuration adjustments for 'dev' environment
-    $config['bootstrap'][] = 'debug';
-    $config['modules']['debug'] = 'yii\debug\Module';
-}
-
-return $config;
