@@ -8,6 +8,7 @@ use tests\codeception\fixtures\ProjectFixture;
 use tests\codeception\fixtures\UserFixture;
 use UnitTester;
 use user\models\User;
+use Yii;
 
 /**
  * Test ContributionReview model
@@ -19,12 +20,15 @@ class ContributionReviewTest extends Unit
      */
     protected $tester;
 
-    public function setUp()
+    /**
+     * Tests fixtures
+     */
+    public function fixtures()
     {
-        $this->getModule('Yii2')->haveFixtures([
+        return [
             'users' => UserFixture::className(),
             'projects' => ProjectFixture::className(),
-        ]);
+        ];
     }
 
     /**

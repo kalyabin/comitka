@@ -276,34 +276,6 @@ class UserModule extends BaseModule
     }
 
     /**
-     * Update user roles
-     *
-     * @param UserForm $user
-     */
-    protected function updateRoles(UserForm $user)
-    {
-        /* @var $authManager DbManager */
-        $authManager = Yii::$app->authManager;
-        /* @var $db Connection */
-        $db = $authManager->db;
-
-        // remove exists roles
-        $db->createCommand()
-            ->delete($authManager->assignmentTable, 'user_id=:user_id', [
-                ':user_id' => $user->id,
-            ])
-            ->execute();
-
-        // create new roles
-        if (is_array($user->roles)) {
-            foreach ($user->roles as $role) {
-                $role = $authManager->getRole($role);
-                $authManager->assign($role, $user->id);
-            }
-        }
-    }
-
-    /**
      * Update user and send notification
      *
      * @param UserForm $user
@@ -332,7 +304,7 @@ class UserModule extends BaseModule
 
         try {
             $user->save();
-            $this->updateRoles($user);
+            $this->updateUserRoles($user, $user->roles);
             $transaction->commit();
         }
         catch (Exception $ex) {
@@ -409,7 +381,7 @@ class UserModule extends BaseModule
             $user->status = User::STATUS_ACTIVE;
             $user->save();
 
-            $this->updateRoles($user);
+            $this->updateUserRoles($user, $user->roles);
 
             if ($user->sendNotification) {
                 // send user's notification

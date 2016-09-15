@@ -28,15 +28,22 @@ class UserManagerTest extends Unit
     protected $userModule;
 
     /**
+     * Test fixtures
+     */
+    public function fixtures()
+    {
+        return [
+            'users' => UserFixture::className(),
+        ];
+    }
+
+    /**
      * @inheritdoc
      */
     public function setUp()
     {
-        parent::setUp();
-        $this->getModule('Yii2')->haveFixtures([
-            'users' => UserFixture::className(),
-        ]);
         $this->userModule = Yii::$app->getModule('user');
+        parent::setUp();
     }
 
     /**

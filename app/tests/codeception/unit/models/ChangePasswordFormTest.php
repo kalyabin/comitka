@@ -4,6 +4,7 @@ namespace models;
 use Codeception\Test\Unit;
 use UnitTester;
 use user\models\ChangePasswordForm;
+use Yii;
 
 /**
  * Test change password form model

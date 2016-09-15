@@ -24,14 +24,21 @@ class ProjectApiTest extends Unit
      */
     protected $projectApi;
 
-    public function setUp()
+    /**
+     * Tests fixtures
+     */
+    public function fixtures()
     {
-        parent::setUp();
-        $this->getModule('Yii2')->haveFixtures([
+        return [
             'projects' => ProjectFixture::className(),
             'users' => UserFixture::className(),
-        ]);
+        ];
+    }
+
+    public function setUp()
+    {
         $this->projectApi = Yii::$app->getModule('project');
+        parent::setUp();
     }
 
     /**

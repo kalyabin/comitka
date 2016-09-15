@@ -12,11 +12,6 @@ $common = include __DIR__ . '/common.php';
 if (defined('YII_ENV_DEV') && YII_ENV_DEV === true) {
     $localCfg = \yii\helpers\ArrayHelper::merge([
         'bootstrap' => ['gii'],
-        'controllerMap' => [
-            'fixture' => [
-                'class' => 'yii\faker\FixtureController',
-            ],
-        ],
         'modules' => [
             'gii' => 'yii\gii\Module',
         ],

@@ -17,14 +17,13 @@ class ProjectManagerTest extends Unit
     protected $tester;
 
     /**
-     * @inheritdoc
+     * Tests fixtures
      */
-    public function setUp()
+    public function fixtures()
     {
-        parent::setUp();
-        $this->getModule('Yii2')->haveFixtures([
+        return [
             'projects' => ProjectFixture::className(),
-        ]);
+        ];
     }
 
     /**
