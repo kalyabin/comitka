@@ -25,6 +25,18 @@
         {
             "type": "package",
             "package": {
+                "name": "codeception/codeception",
+                "version": "dev-master",
+                "source": {
+                    "url": "https://github.com/kalyabin/Codeception",
+                    "type": "git",
+                    "reference": "master"
+                }
+            }
+        },
+        {
+            "type": "package",
+            "package": {
                 "name": "isagalaev/highlight.js",
                 "version": "9.2.0",
                 "source": {
