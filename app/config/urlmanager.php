@@ -9,6 +9,7 @@ return [
     'showScriptName' => false,
     'rules' => [
         '/' => 'main/index',
+        '/reviews/<type:(my-reviews|my-contributions|all-contributions)>' => 'main/reviews',
         '/sign-in' => '/user/auth/sign-in',
         '/sign-out' => '/user/auth/sign-out',
         '/forgot-password' => '/user/auth/forgot-password',

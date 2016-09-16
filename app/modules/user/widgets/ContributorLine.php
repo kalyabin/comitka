@@ -43,9 +43,13 @@ class ContributorLine extends Widget
     public $useLink = true;
 
     /**
-     * @var User User model if user exists in a system
+     * User model if user exists in a system.
+     *
+     * Or user model if already used in memory.
+     *
+     * @var User
      */
-    protected $user;
+    public $user;
 
     /**
      * Retreive user model if it exists at database
@@ -58,7 +62,9 @@ class ContributorLine extends Widget
         /* @var $api UserModule */
         $api = Yii::$app->getModule('user');
 
-        $this->user = $api->getUserByUsername($this->vcsType, $this->contributorName, $this->contributorEmail);
+        if (!($this->user instanceof User)) {
+            $this->user = $api->getUserByUsername($this->vcsType, $this->contributorName, $this->contributorEmail);
+        }
     }
 
     /**

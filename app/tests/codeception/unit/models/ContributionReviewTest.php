@@ -165,6 +165,114 @@ class ContributionReviewTest extends Unit
                     'isValid' => true,
                 ],
             ],
+            'message' => [
+                [
+                    'value' => null,
+                    'isValid' => true,
+                ],
+                [
+                    'value' => 0,
+                    'isValid' => false,
+                ],
+                [
+                    'value' => [],
+                    'isValid' => true,
+                ],
+                [
+                    'value' => ['wrong string'],
+                    'isValid' => false,
+                ],
+                [
+                    'value' => 'test message',
+                    'isValid' => true,
+                ]
+            ],
+            'contributor_email' => [
+                [
+                    'value' => null,
+                    'isValid' => true,
+                ],
+                [
+                    'value' => [],
+                    'isValid' => true,
+                ],
+                [
+                    'value' => 0,
+                    'isValid' => false,
+                ],
+                [
+                    'value' => ['wrong string'],
+                    'isValid' => false,
+                ],
+                [
+                    'value' => 'test contributor',
+                    'isValid' => true,
+                ]
+            ],
+            'contributor_name' => [
+                [
+                    'value' => null,
+                    'isValid' => false,
+                ],
+                [
+                    'value' => [],
+                    'isValid' => false,
+                ],
+                [
+                    'value' => 0,
+                    'isValid' => false,
+                ],
+                [
+                    'value' => '',
+                    'isValid' => false,
+                ],
+                [
+                    'value' => ['wrong string'],
+                    'isValid' => false,
+                ],
+                [
+                    'value' => 'test contributor',
+                    'isValid' => true,
+                ],
+            ],
+            'repo_type' => [
+                [
+                    'value' => null,
+                    'isValid' => false,
+                ],
+                [
+                    'value' => [],
+                    'isValid' => false,
+                ],
+                [
+                    'value' => 0,
+                    'isValid' => false,
+                ],
+                [
+                    'value' => '',
+                    'isValid' => false,
+                ],
+                [
+                    'value' => ['wrong string'],
+                    'isValid' => false,
+                ],
+                [
+                    'value' => 'wrong repo',
+                    'isValid' => false,
+                ],
+                [
+                    'value' => 'svn',
+                    'isValid' => true,
+                ],
+                [
+                    'value' => 'git',
+                    'isValid' => true,
+                ],
+                [
+                    'value' => 'hg',
+                    'isValid' => true,
+                ],
+            ],
             'reviewed' => [
                 [
                     'value' => null,

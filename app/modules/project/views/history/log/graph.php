@@ -42,18 +42,17 @@ HistoryGraphAsset::register($this, [
 <div class="list-group" id="historySimple">
     <?php foreach ($history as $commit):?>
     <a class="list-group-item col-md-12 history-simple-item js-history-simple-item" href="<?=Url::to(['commit-summary', 'id' => $project->id, 'commitId' => $commit->getId()])?>">
-            <div class="col-md-2">
-                <span class="commit-date"><?=$commit->getDate()->format('d\'M y H:i:s')?></span>
-            </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <?= ContributorLine::widget([
                     'contributorName' => $commit->contributorName,
                     'vcsType' => $project->repo_type,
                     'avatarSize' => 'small',
                     'useLink' => false,
-                ]) ?>
+                ]) ?><br />
+                <span class="label label-info"><?= Html::encode($project->title) ?></span>
+                <span class="commit-date"><?=$commit->getDate()->format('d\'M y H:i:s')?></span>
             </div>
-            <div class="col-md-7 commit-message">
+            <div class="col-md-8 commit-message">
                 <strong class="list-group-item-heading"><?=Html::encode($commit->message)?></strong>
             </div>
         </a>

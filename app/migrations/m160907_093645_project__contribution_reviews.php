@@ -15,10 +15,14 @@ class m160907_093645_project__contribution_reviews extends Migration
     {
         $this->createTable($this->table, [
             'commit_id' => $this->string(40)->notNull()->comment('Commit identifier'),
+            'date' => $this->datetime()->notNull()->comment('Contribution date'),
+            'message' => $this->text()->comment('Commit message'),
+            'contributor_email' => $this->string(100)->comment('Contributor e-mail'),
+            'contributor_name' => $this->string(100)->notNull()->comment('Contributor user name'),
+            'repo_type' => $this->string(3)->notNull()->comment('Repository type'),
             'project_id' => $this->integer()->notNull()->comment('Project identifier'),
             'contributor_id' => $this->integer()->null()->comment('Contributor user id'),
             'reviewer_id' => $this->integer()->null()->comment('Reviewer user id'),
-            'date' => $this->datetime()->notNull()->comment('Contribution date'),
             'reviewed' => $this->dateTime()->null()->comment('Review date by reviewer'),
         ], "ENGINE=InnoDB CHARACTER SET utf8 COLLATE utf8_unicode_ci COMMENT 'Contributions reviews'");
 

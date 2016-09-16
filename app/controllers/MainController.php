@@ -2,6 +2,9 @@
 namespace app\controllers;
 
 use app\components\AuthControl;
+use project\models\ContributionReview;
+use Yii;
+use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 
@@ -29,10 +32,61 @@ class MainController extends Controller
     }
 
     /**
+     * Need to review contributions
+     *
+     * Type variable has states:
+     * - my-reviews - reviews to current contributor;
+     * - all-contributions - all contributions;
+     * - my-contributions - current user contributions
+     *
+     * @param string $type Contribution types
+     *
+     * @return mixed
+     *
+     * @throws \yii\web\NotFoundHttpException
+     */
+    public function actionReviews($type)
+    {
+        $res = ContributionReview::find()->with('project', 'contributor')->orderBy([
+            'date' => SORT_DESC,
+        ]);
+
+        if ($type == 'my-reviews') {
+            // contribution reviews to current contributor
+            $res->andWhere([
+                'reviewer_id' => Yii::$app->user->getId(),
+                'reviewed' => null,
+            ]);
+        } elseif ($type == 'all-contributions') {
+            // all contributions reviews
+            $res->andWhere([
+                'reviewed' => null,
+            ]);
+        } elseif ($type == 'my-contributions') {
+            // current contributor commits
+            $res->andWhere([
+                'contributor_id' => Yii::$app->user->getId(),
+            ]);
+        } else {
+            throw new \yii\web\NotFoundHttpException();
+        }
+
+        $dataProvider = new ActiveDataProvider([
+            'id' => $type,
+            'query' => $res,
+            'sort' => false,
+        ]);
+
+        return $this->render('reviews', [
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    /**
      * Application index
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        return $this->redirect(['reviews', 'type' => 'my-reviews']);
     }
 }

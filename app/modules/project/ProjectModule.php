@@ -79,6 +79,10 @@ class ProjectModule extends BaseModule
             'commit_id' => $commit->getId(),
             'project_id' => $project->id,
             'date' => $commit->getDate()->format('Y-m-d H:i:s'),
+            'message' => $commit->message,
+            'contributor_name' => $commit->contributorName,
+            'contributor_email' => $commit->contributorEmail,
+            'repo_type' => $project->repo_type,
         ]);
 
         // set users ids

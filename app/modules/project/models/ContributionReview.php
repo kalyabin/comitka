@@ -2,6 +2,7 @@
 
 namespace project\models;
 
+use DateTime;
 use user\models\User;
 use Yii;
 use yii\db\ActiveQuery;
@@ -21,6 +22,10 @@ use yii\validators\DateValidator;
  * @property integer $reviewer_id Reviewer user identifier (null if not detected)
  * @property string $date Contribution date and time
  * @property string $reviewed Review date by reviewer
+ * @property string $message Commit message
+ * @property string $contributor_email Contributor e-mail
+ * @property string $contributor_name Contributor user name
+ * @property string $repo_type Repository type
  *
  * @property User $contributor Relation to contributor user model
  * @property User $reviewer Relation to reviewer user model
@@ -42,9 +47,14 @@ class ContributionReview extends ActiveRecord
     public function rules()
     {
         return [
-            [['commit_id', 'project_id', 'date'], 'required'],
+            [['commit_id', 'project_id', 'date', 'repo_type', 'contributor_name'], 'required'],
             [['project_id', 'contributor_id', 'reviewer_id'], 'integer'],
             [['date', 'reviewed'], 'date', 'format' => 'yyyy-MM-dd HH:mm:ss', 'type' => DateValidator::TYPE_DATETIME],
+            [['message'], 'string'],
+            [['contributor_email', 'contributor_name'], 'string', 'max' => 100],
+            [['repo_type'], 'string'],
+            [['repo_type'], 'in', 'range' => [Project::REPO_GIT, Project::REPO_HG, Project::REPO_SVN]],
+            [['message', 'contributor_email'], 'default', 'value' => ''],
             [['commit_id'], 'string', 'max' => 40],
             [['commit_id'], 'unique', 'targetAttribute' => ['commit_id', 'project_id']],
             [['contributor_id', 'reviewer_id'], 'default', 'value' => null],
@@ -64,6 +74,10 @@ class ContributionReview extends ActiveRecord
             'reviewer_id' => Yii::t('project', 'Reviewer user id'),
             'date' => Yii::t('project', 'Date'),
             'reviewed' => Yii::t('project', 'Review date by reviewer'),
+            'message' => Yii::t('project', 'Commit message'),
+            'contributor_email' => Yii::t('project', 'Contributor e-mail'),
+            'contributor_name' => Yii::t('project', 'Contributor user name'),
+            'repo_type' => Yii::t('project', 'Repository type'),
         ];
     }
 
@@ -95,5 +109,15 @@ class ContributionReview extends ActiveRecord
     public function getReviewer()
     {
         return $this->hasOne(User::className(), ['id' => 'reviewer_id']);
+    }
+
+    /**
+     * Commit date and time object
+     *
+     * @return DateTime
+     */
+    public function getDateTime()
+    {
+        return new DateTime($this->date);
     }
 }
