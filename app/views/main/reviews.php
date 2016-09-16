@@ -51,7 +51,7 @@ $this->title = Yii::t('main', 'Contributions');
             <?php
              /* @var $model ContributionReview */
             ?>
-            <a class="list-group-item col-md-12 history-simple-item" href="<?=Url::to(['commit-summary', 'id' => $model->project_id, 'commitId' => $model->commit_id])?>">
+            <a class="list-group-item col-md-12 history-simple-item" href="<?=Url::to(['/project/history/commit-summary', 'id' => $model->project_id, 'commitId' => $model->commit_id])?>">
                 <div class="col-md-4">
                     <?= ContributorLine::widget([
                         'contributorName' => $model->contributor_name,
