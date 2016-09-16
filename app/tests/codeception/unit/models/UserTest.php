@@ -35,6 +35,9 @@ class UserTest extends Unit
      */
     public function testValidationAndSave()
     {
+        /* @var $reviewer User */
+        $reviewer = $this->getModule('Yii2')->grabFixture('users', 'activeUser1');
+
         $model = new User();
 
         $attributes = [
@@ -133,7 +136,37 @@ class UserTest extends Unit
                     'value' => str_repeat('A', 255),
                     'isValid' => true,
                 ]
-            ]
+            ],
+            'default_reviewer_id' => [
+                [
+                    'value' => null,
+                    'isValid' => true,
+                ],
+                [
+                    'value' => 0,
+                    'isValid' => true,
+                ],
+                [
+                    'value' => [],
+                    'isValid' => true,
+                ],
+                [
+                    'value' => '',
+                    'isValid' => true,
+                ],
+                [
+                    'value' => 'wrong integer',
+                    'isValid' => false,
+                ],
+                [
+                    'value' => ['wrong integer'],
+                    'isValid' => false,
+                ],
+                [
+                    'value' => $reviewer->id,
+                    'isValid' => true,
+                ]
+            ],
         ];
 
         $this->getModule('\Helper\Unit')->validateModelAttributes($model, $attributes, $this);

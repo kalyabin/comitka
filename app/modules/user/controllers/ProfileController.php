@@ -41,7 +41,7 @@ class ProfileController extends Controller
         return [
             'vcs-bindings' => [
                 'class' => VcsBindingsAction::className(),
-                'model' => Yii::$app->user->identity,
+                'model' => Yii::$app->user->getIdentity(),
             ]
         ];
     }

@@ -78,6 +78,7 @@ class UserForm extends User
 
             ['deleteAvatar', 'boolean'],
             ['uploadedAvatar', 'image'],
+            [['default_reviewer_id'], 'integer', 'except' => ['profile']],
         ];
     }
 
@@ -184,5 +185,29 @@ class UserForm extends User
         }
 
         return parent::beforeSave($insert);
+    }
+
+    /**
+     * Retrieve other contributors for drop down input.
+     *
+     * An array key is user identifier, value - user name.
+     *
+     * @return string[]
+     */
+    public function getReviewersForDropDown()
+    {
+        $users = [];
+
+        if ($this->isNewRecord) {
+            $users = static::find()->all();
+        } else {
+            $users = static::find()->andWhere('id <> :id', [
+                ':id' => $this->id
+            ])->all();
+        }
+
+        return ArrayHelper::merge(['' => ''], ArrayHelper::map($users, 'id', function(User $user) {
+            return $user->name . ' (' . $user->email . ')';
+        }));
     }
 }

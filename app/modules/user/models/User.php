@@ -18,6 +18,7 @@ use yii\web\IdentityInterface;
  * @property string $password Password hash
  * @property integer $status User status by self::STATUS_* constants
  * @property string $avatar Avatar relative filename
+ * @property integer $default_reviewer_id Default user reviewer
  *
  * @property UserChecker $checker Checker model relation
  * @property UserAccount[] $accounts VCS user accounts
@@ -102,6 +103,8 @@ class User extends ActiveRecord implements IdentityInterface
                 /* @var $data User */
                 return empty($data->newPassword);
             }],
+            [['default_reviewer_id'], 'integer'],
+            [['default_reviewer_id'], 'default', 'value' => null],
         ];
     }
 
@@ -116,6 +119,7 @@ class User extends ActiveRecord implements IdentityInterface
             'email' => Yii::t('user', 'E-mail'),
             'password' => Yii::t('user', 'Password'),
             'status' => Yii::t('user', 'Status'),
+            'default_reviewer_id' => Yii::t('user', 'Default user reviewer'),
         ];
     }
 
@@ -222,6 +226,16 @@ class User extends ActiveRecord implements IdentityInterface
             $newModel->save();
         }
         return $this->hasOne(UserChecker::className(), ['user_id' => 'id']);
+    }
+
+    /**
+     * Retrieve default reviewer model
+     *
+     * @return User
+     */
+    public function getDefaultReviewer()
+    {
+        return $this->hasOne(static::className(), ['default_reviewer_id' => 'id']);
     }
 
     /**

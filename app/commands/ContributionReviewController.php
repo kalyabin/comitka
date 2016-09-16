@@ -53,7 +53,7 @@ class ContributionReviewController extends Controller
 
         $dateFrom = DateTime::createFromFormat('Y-m-d H:i:s', $dateFrom);
         if ($dateFrom === false) {
-            $this->stderr("Wrong date time format", Console::FG_RED);
+            $this->stderr('Wrong date time format', Console::FG_RED);
             return 1;
         }
 
@@ -70,21 +70,30 @@ class ContributionReviewController extends Controller
 
         $this->logInfo('Total projects count: ', $resProject->count());
 
+
         foreach ($resProject->each() as $project) {
             /* @var $project Project */
-            $this->logInfo("Collect contributions for: ", $project->title);
+            $this->logInfo('Collect contributions for: ', $project->title);
+            // calculate sum
+            $cntCollected = 0;
+            $cntErrors = 0;
             foreach ($projectApi->getProjectContributions($project, $dateFrom) as $commit) {
                 /* @var $commit BaseCommit */
                 $contributor = $userApi->getUserByUsername($project->repo_type, $commit->contributorName, $commit->contributorEmail);
                 $contributorId = $contributor ? $contributor->id : null;
-                $model = $projectApi->createContributionReview($project, $commit, $contributorId);
+                $reviewerUserId = $contributor ? $contributor->default_reviewer_id : null;
+                $model = $projectApi->createContributionReview($project, $commit, $contributorId, $reviewerUserId);
                 if ($model) {
                     $this->stdout('.', Console::FG_GREEN);
+                    $cntCollected++;
                 } else {
                     $this->stdout('x', Console::FG_RED);
+                    $cntErrors++;
                 }
             }
             $this->stdout("\n");
+            $this->logInfo('Collected: ', $cntCollected);
+            $this->logInfo('Errors: ', $cntErrors);
         }
     }
 }

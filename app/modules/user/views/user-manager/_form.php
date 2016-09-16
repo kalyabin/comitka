@@ -30,6 +30,12 @@ $form = ActiveForm::begin([
         <?= $form->field($model, 'sendNotification')->checkbox() ?>
     </div>
     <div class="panel-heading">
+        <?= Yii::t('user', 'Contributor to review this user') ?>
+    </div>
+    <div class="panel-body">
+        <?= $form->field($model, 'default_reviewer_id')->dropDownList($model->getReviewersForDropDown()) ?>
+    </div>
+    <div class="panel-heading">
         <?= Yii::t('user', 'Permissions') ?>
     </div>
     <div class="panel-body">
