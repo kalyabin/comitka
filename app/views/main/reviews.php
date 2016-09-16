@@ -55,7 +55,6 @@ $this->title = Yii::t('main', 'Contributions');
                 <div class="col-md-4">
                     <?= ContributorLine::widget([
                         'contributorName' => $model->contributor_name,
-                        'contributorEmail' => $model->contributor_email,
                         'user' => $model->contributor,
                         'vcsType' => $model->repo_type,
                         'avatarSize' => 'small',
