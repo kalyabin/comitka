@@ -29,6 +29,10 @@ $this->title = Yii::t('main', 'Contributions');
         [
             'url' => ['main/reviews', 'type' => 'all-contributions'],
             'label' => Yii::t('main', 'All contributions'),
+        ],
+        [
+            'url' => ['main/reviews', 'type' => 'no-reviewer'],
+            'label' => Yii::t('main', 'Contributions without reviewer'),
         ]
     ],
 ]) ?>
@@ -40,6 +44,8 @@ $this->title = Yii::t('main', 'Contributions');
         <?= Yii::t('main', 'My contributions') ?>
     <?php elseif ($dataProvider->id == 'all-contributions'):?>
         <?= Yii::t('main', 'All contributions') ?>
+    <?php elseif ($dataProvider->id == 'no-reviewer'):?>
+        <?= Yii::t('main', 'Contributions without reviewer') ?>
     <?php endif;?>
 </h2>
 

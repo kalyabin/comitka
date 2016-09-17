@@ -37,7 +37,8 @@ class MainController extends Controller
      * Type variable has states:
      * - my-reviews - reviews to current contributor;
      * - all-contributions - all contributions;
-     * - my-contributions - current user contributions
+     * - my-contributions - current user contributions;
+     * - no-reviewer - contributions without reviewer;
      *
      * @param string $type Contribution types
      *
@@ -66,6 +67,11 @@ class MainController extends Controller
             // current contributor commits
             $res->andWhere([
                 'contributor_id' => Yii::$app->user->getId(),
+            ]);
+        } elseif ($type == 'no-reviewer') {
+            // without reviewer
+            $res->andWhere([
+                'reviewer_id' => null,
             ]);
         } else {
             throw new \yii\web\NotFoundHttpException();
