@@ -2,6 +2,7 @@
 
 namespace project;
 
+use app\models\ContributorInterface;
 use DateTime;
 use project\models\ContributionReview;
 use project\models\Project;
@@ -66,12 +67,12 @@ class ProjectModule extends BaseModule
      *
      * @param Project $project Project model to relate with model
      * @param BaseCommit $commit Contribution model to relate with model
-     * @param integer $contributorUserId Contributor user id (null if not set)
-     * @param integer $reviewerUserId Reviewer user id (null if not set)
+     * @param ContributorInterface $contributor Contributor model
+     * @param ContributorInterface $reviewer Reviewer model (null if set to default contributor reviewer)
      *
      * @return ContributionReview|null
      */
-    public function createContributionReview(Project $project, BaseCommit $commit, $contributorUserId = null, $reviewerUserId = null)
+    public function createContributionReview(Project $project, BaseCommit $commit, ContributorInterface $contributor, $reviewer = null)
     {
         $model = new ContributionReview();
 
@@ -83,15 +84,11 @@ class ProjectModule extends BaseModule
             'contributor_name' => $commit->contributorName,
             'contributor_email' => $commit->contributorEmail,
             'repo_type' => $project->repo_type,
+            'contributor_id' => $contributor->getContributorId(),
+            'reviewer_id' => $reviewer instanceof ContributorInterface ?
+                $reviewer->getContributorId() :
+                $contributor->getDefaultViewerId(),
         ]);
-
-        // set users ids
-        if (is_scalar($contributorUserId) && (int) $contributorUserId > 0) {
-            $model->contributor_id = (int) $contributorUserId;
-        }
-        if (is_scalar($reviewerUserId) && (int) $reviewerUserId > 0) {
-            $model->reviewer_id = (int) $reviewerUserId;
-        }
 
         if ($model->save()) {
             return $model;

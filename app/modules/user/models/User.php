@@ -2,6 +2,7 @@
 
 namespace user\models;
 
+use app\models\ContributorInterface;
 use user\UserModule;
 use Yii;
 use yii\db\ActiveQuery;
@@ -23,7 +24,7 @@ use yii\web\IdentityInterface;
  * @property UserChecker $checker Checker model relation
  * @property UserAccount[] $accounts VCS user accounts
  */
-class User extends ActiveRecord implements IdentityInterface
+class User extends ActiveRecord implements IdentityInterface, ContributorInterface
 {
     /**
      * Max name length
@@ -212,6 +213,36 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * Get contributor id
+     *
+     * @return string
+     */
+    public function getContributorId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Get contributor name
+     *
+     * @return string
+     */
+    public function getContributorName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Get contributor e-mail
+     *
+     * @return string
+     */
+    public function getContributorEmail()
+    {
+        return $this->email;
+    }
+
+    /**
      * Return's ActiveQuery to find user's checker.
      * If model not exists - create it.
      *
@@ -281,6 +312,16 @@ class User extends ActiveRecord implements IdentityInterface
     public function getAvatarUrl()
     {
         return is_file(Yii::getAlias(self::AVATAR_PATH . $this->avatar)) ? self::AVATAR_URL . $this->avatar : null;
+    }
+
+    /**
+     * Get default reviewer id
+     *
+     * @return string
+     */
+    public function getDefaultViewerId()
+    {
+        return $this->default_reviewer_id;
     }
 
     /**

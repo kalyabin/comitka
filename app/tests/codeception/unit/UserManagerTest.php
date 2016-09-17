@@ -1,5 +1,6 @@
 <?php
 
+use app\components\ContributorApi;
 use Codeception\Test\Unit;
 use tests\codeception\fixtures\UserFixture;
 use user\models\ChangePasswordForm;
@@ -427,7 +428,9 @@ class UserManagerTest extends Unit
 
         $this->assertEquals(1, count($user->accounts));
 
-        $getByName = $this->userModule->getUserByUsername(UserAccount::TYPE_HG, 'testing user name hg');
+        /* @var $contributorApi ContributorApi */
+        $contributorApi = Yii::$app->contributors;
+        $getByName = $contributorApi->getContributor(UserAccount::TYPE_HG, 'testing user name hg');
 
         $this->assertInstanceOf(User::className(), $getByName);
         $this->assertEquals($getByName->id, $user->id);

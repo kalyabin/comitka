@@ -1,5 +1,7 @@
 <?php
 
+use app\models\ContributorInterface;
+use app\models\UnregisteredContributor;
 use Codeception\Test\Unit;
 use project\models\ContributionReview;
 use project\models\Project;
@@ -87,27 +89,37 @@ class ProjectApiTest extends Unit
         $contributor = $this->getModule('Yii2')->grabFixture('users', 'activeUser2');
 
         // create review without users
-        $contributionReview = $this->projectApi->createContributionReview($project, $commit);
+        $contributionReview = $this->projectApi->createContributionReview($project, $commit, new UnregisteredContributor());
         $this->assertInstanceOf(ContributionReview::className(), $contributionReview);
         $this->assertInstanceOf(Project::className(), $contributionReview->project);
         $this->assertEquals($contributionReview->project->id, $project->id);
         $this->assertNull($contributionReview->reviewer);
-        $this->assertNull($contributionReview->contributor);
+        $this->assertInstanceOf(UnregisteredContributor::className(), $contributionReview->contributor);
 
         // check unique
-        $this->assertNull($this->projectApi->createContributionReview($project, $commit));
+        $this->assertNull($this->projectApi->createContributionReview($project, $commit, new UnregisteredContributor()));
 
         // remove review
         $this->assertEquals(1, $contributionReview->delete());
 
         // create review with users
-        $contributionReview = $this->projectApi->createContributionReview($project, $commit, $contributor->id, $reviewer->id);
+        $contributionReview = $this->projectApi->createContributionReview($project, $commit, $contributor);
         $this->assertInstanceOf(ContributionReview::className(), $contributionReview);
         $this->assertInstanceOf(Project::className(), $contributionReview->project);
         $this->assertEquals($contributionReview->project->id, $project->id);
-        $this->assertInstanceOf(User::className(), $contributionReview->reviewer);
+        $this->assertNull($contributionReview->reviewer);
+        $this->assertInstanceOf(ContributorInterface::class, $contributionReview->contributor);
+        $this->assertEquals($contributionReview->contributor->id, $contributor->id);
+
+        $this->assertEquals(1, $contributionReview->delete());
+
+        $contributionReview = $this->projectApi->createContributionReview($project, $commit, $contributor, $reviewer);
+        $this->assertInstanceOf(ContributionReview::className(), $contributionReview);
+        $this->assertInstanceOf(Project::className(), $contributionReview->project);
+        $this->assertEquals($contributionReview->project->id, $project->id);
+        $this->assertInstanceOf(ContributorInterface::class, $contributionReview->reviewer);
         $this->assertEquals($contributionReview->reviewer->id, $reviewer->id);
-        $this->assertInstanceOf(User::className(), $contributionReview->contributor);
+        $this->assertInstanceOf(ContributorInterface::class, $contributionReview->contributor);
         $this->assertEquals($contributionReview->contributor->id, $contributor->id);
     }
 }

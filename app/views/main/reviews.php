@@ -1,7 +1,8 @@
 <?php
 
+use app\components\ContributorApi;
+use app\widgets\ContributorLine;
 use project\models\ContributionReview;
-use user\widgets\ContributorLine;
 use yii\bootstrap\Nav;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
@@ -11,7 +12,6 @@ use yii\widgets\LinkPager;
 
 /* @var $this View */
 /* @var $dataProvider ActiveDataProvider */
-
 $this->title = Yii::t('main', 'Contributions');
 ?>
 
@@ -54,9 +54,7 @@ $this->title = Yii::t('main', 'Contributions');
             <a class="list-group-item col-md-12 history-simple-item" href="<?=Url::to(['/project/history/commit-summary', 'id' => $model->project_id, 'commitId' => $model->commit_id])?>">
                 <div class="col-md-4">
                     <?= ContributorLine::widget([
-                        'contributorName' => $model->contributor_name,
-                        'user' => $model->contributor,
-                        'vcsType' => $model->repo_type,
+                        'contributor' => $model->contributor,
                         'avatarSize' => 'small',
                         'useLink' => false,
                     ]) ?><br />

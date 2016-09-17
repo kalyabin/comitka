@@ -29,5 +29,6 @@ return [
         '/projects/<id:(\d+)>/revisions/<type:(graph|simple)>' => '/project/history/log',
         '/projects/<id:(\d+)>/revisions/<commitId:([a-f0-9]+)>/summary' => '/project/history/commit-summary',
         '/projects/<id:(\d+)>/revisions/<commitId:([a-f0-9]+)>/details' => '/project/history/file-view',
+        '/projects/<projectId:(\d+)>/<commitId:([a-f0-9]+)>/<action:(create-self-review|finish-review)>' => '/project/contribution-review/<action>',
     ],
 ];

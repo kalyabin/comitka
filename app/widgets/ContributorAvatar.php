@@ -1,19 +1,19 @@
 <?php
-namespace user\widgets;
+namespace app\widgets;
 
 use user\models\User;
 use yii\base\Widget;
 use yii\helpers\Html;
 
 /**
- * Retreive user avatar if it exists.
+ * Retreive contributor avatar if it exists.
  */
-class UserAvatar extends Widget
+class ContributorAvatar extends Widget
 {
     /**
-     * @var User|null User model or null if non-registered user avatar
+     * @var ContributorInterface|null Contributor model or null if non-registered contributor avatar
      */
-    public $user;
+    public $contributor;
 
     /**
      * @var string Avatar size: small, middle, normal
@@ -36,8 +36,8 @@ class UserAvatar extends Widget
 
         $userAvatar = '';
 
-        if ($this->user instanceof User) {
-            $avatarUrl = $this->user->getAvatarUrl();
+        if ($this->contributor instanceof \app\models\ContributorInterface) {
+            $avatarUrl = $this->contributor->getAvatarUrl();
             $userAvatar = $avatarUrl ? Html::img($avatarUrl) : '';
         }
 

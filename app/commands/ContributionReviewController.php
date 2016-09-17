@@ -1,6 +1,7 @@
 <?php
 namespace app\commands;
 
+use app\components\ContributorApi;
 use DateTime;
 use project\models\ContributionReview;
 use project\models\Project;
@@ -59,8 +60,8 @@ class ContributionReviewController extends Controller
 
         /* @var $projectApi ProjectModule */
         $projectApi = Yii::$app->getModule('project');
-        /* @var $userApi UserModule */
-        $userApi = Yii::$app->getModule('user');
+        /* @var $contributorApi ContributorApi */
+        $contributorApi = Yii::$app->contributors;
 
         $resProject = Project::find();
 
@@ -79,10 +80,8 @@ class ContributionReviewController extends Controller
             $cntErrors = 0;
             foreach ($projectApi->getProjectContributions($project, $dateFrom) as $commit) {
                 /* @var $commit BaseCommit */
-                $contributor = $userApi->getUserByUsername($project->repo_type, $commit->contributorName, $commit->contributorEmail);
-                $contributorId = $contributor ? $contributor->id : null;
-                $reviewerUserId = $contributor ? $contributor->default_reviewer_id : null;
-                $model = $projectApi->createContributionReview($project, $commit, $contributorId, $reviewerUserId);
+                $contributor = $contributorApi->getContributor($project->repo_type, $commit->contributorName, $commit->contributorEmail);
+                $model = $projectApi->createContributionReview($project, $commit, $contributor);
                 if ($model) {
                     $this->stdout('.', Console::FG_GREEN);
                     $cntCollected++;

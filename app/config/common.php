@@ -43,6 +43,9 @@ return ArrayHelper::merge([
     ], include __DIR__ . '/aliases.php'),
     'components' => [
         'mailer' => $mailerConfig,
+        'contributors' => [
+            'class' => 'app\components\ContributorApi',
+        ],
         'i18n' => [
             'translations' => [
                 '*' => [

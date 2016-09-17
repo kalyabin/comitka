@@ -2,8 +2,10 @@
 
 namespace project\models;
 
+use app\components\ContributorApi;
+use app\models\ContributorInterface;
+use app\models\UnregisteredContributor;
 use DateTime;
-use user\models\User;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -27,12 +29,22 @@ use yii\validators\DateValidator;
  * @property string $contributor_name Contributor user name
  * @property string $repo_type Repository type
  *
- * @property User $contributor Relation to contributor user model
- * @property User $reviewer Relation to reviewer user model
+ * @property ContributorInterface $contributor Relation to contributor user model
+ * @property ContributorInterface|null $reviewer Relation to reviewer user model
  * @property Project $project Relation to project model
  */
 class ContributionReview extends ActiveRecord
 {
+    /**
+     * @var ContributorInterface|null Contributor model
+     */
+    protected $contributor;
+
+    /**
+     * @var ContributorInterface|null Reviewer model
+     */
+    protected $reviewer;
+
     /**
      * @inheritdoc
      */
@@ -92,13 +104,24 @@ class ContributionReview extends ActiveRecord
     }
 
     /**
-     * Retrieve a contributor user model
+     * Retrieve a contributor model
      *
-     * @return ActiveQuery
+     * @return ContributorInterface
      */
     public function getContributor()
     {
-        return $this->hasOne(User::className(), ['id' => 'contributor_id']);
+        if (is_null($this->contributor) && !is_null($this->contributor_id)) {
+            /* @var $contributorApi ContributorApi */
+            $contributorApi = Yii::$app->contributors;
+            $this->contributor = $contributorApi->getContributorById($this->contributor_id);
+        } elseif (is_null($this->contributor)) {
+            $this->contributor = new UnregisteredContributor([
+                'contributorName' => $this->contributor_name,
+                'contributorEmail' => $this->contributor_email,
+            ]);
+        }
+
+        return $this->contributor;
     }
 
     /**
@@ -108,7 +131,13 @@ class ContributionReview extends ActiveRecord
      */
     public function getReviewer()
     {
-        return $this->hasOne(User::className(), ['id' => 'reviewer_id']);
+        if (is_null($this->reviewer) && !is_null($this->reviewer_id)) {
+            /* @var $contributorApi ContributorApi */
+            $contributorApi = Yii::$app->contributors;
+            $this->reviewer = $contributorApi->getContributorById($this->reviewer_id);
+        }
+
+        return $this->reviewer;
     }
 
     /**
@@ -119,5 +148,48 @@ class ContributionReview extends ActiveRecord
     public function getDateTime()
     {
         return new DateTime($this->date);
+    }
+
+    /**
+     * Reviewed date and time object
+     *
+     * @return DateTime
+     */
+    public function getReviewedDateTime()
+    {
+        return !is_null($this->reviewed) ? new DateTime($this->reviewed) : null;
+    }
+
+    /**
+     * Returns true, if review is finished.
+     *
+     * @return boolean
+     */
+    public function reviewIsFinished()
+    {
+        return !is_null($this->reviewed);
+    }
+
+    /**
+     * Finish review
+     *
+     * @return boolean
+     */
+    public function finishReview()
+    {
+        $this->reviewed = date('Y-m-d H:i:s');
+        return $this->save(true, ['reviewed']);
+    }
+
+    /**
+     * Returns true, if reviewer can finish review.
+     *
+     * @param integer $reviewerId Reviewer id want to close review
+     *
+     * @return boolean
+     */
+    public function canFinishReview($reviewerId)
+    {
+        return !$this->reviewIsFinished() && $this->reviewer_id == $reviewerId;
     }
 }

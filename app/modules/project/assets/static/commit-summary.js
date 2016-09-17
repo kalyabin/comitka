@@ -7,16 +7,42 @@
  * @param {String} fileContentSelector Selector to file content wrappers
  * @param {String} fileLinkSelector Selector to link for open file view
  * @param {String} fileLinkActiveClass Active file link class
+ * @param {String} reviewButtonSelector Button to manage commit review
+ * @param {String} commitPanelSelector Selector of commit head panel
  */
 (function($) {
     $.fn.commitSummary = function(options) {
         $(document).ready(function() {
             /**
+             * Finish review or set current user as reviewer.
+             *
+             * @param {String} url URL for action (from panel buttons, AJAX)
+             */
+            var changeContributionReviewState = function(url) {
+                $(options.reviewButtonSelector).prop('disabled', true);
+                $.ajax({
+                    'dataType'  : 'json',
+                    'type'      : 'post',
+                    'url'       : url,
+                    'data'      : yii.getCsrfParam() + '=' + yii.getCsrfToken(),
+                    'success'   : function(response) {
+                        $(options.reviewButtonSelector).prop('disabled', false);
+                        if (response.html) {
+                            $(options.commitPanelSelector).html(response.html);
+                        }
+                        if (!response.success && response.message) {
+                            alert(response.message);
+                        }
+                    }
+                });
+            };
+
+            /**
              * Open file view in container.
              * Using AJAX to load content.
              *
-             * @param {string} pageParams HTTP query
-             * @param {string} containerId File view container id
+             * @param {String} pageParams HTTP query
+             * @param {String} containerId File view container id
              */
             var openFileView = function(pageParams, containerId) {
                 $.ajax({
@@ -35,6 +61,14 @@
                     }
                 });
             };
+
+            /**
+             * Change review state: finis review or set reviewer
+             */
+            $(document).on('click', options.reviewButtonSelector, function(e) {
+                e.preventDefault();
+                changeContributionReviewState($(this).data('url'));
+            });
 
             /**
              * Open a file view modal

@@ -1,8 +1,9 @@
 <?php
 
+use app\components\ContributorApi;
+use app\widgets\ContributorLine;
 use project\models\Project;
 use project\widgets\ProjectPanel;
-use user\widgets\ContributorLine;
 use VcsCommon\BaseBranch;
 use VcsCommon\BaseCommit;
 use VcsCommon\BaseRepository;
@@ -19,6 +20,8 @@ use yii\widgets\LinkPager;
 /* @var $branches BaseBranch[] */
 /* @var $repository BaseRepository */
 /* @var $path string */
+/* @var $contributorApi ContributorApi */
+$contributorApi = Yii::$app->contributors;
 ?>
 <?=ProjectPanel::widget(['project' => $project])?>
 
@@ -46,8 +49,7 @@ use yii\widgets\LinkPager;
         <a class="list-group-item col-md-12 history-simple-item" href="<?=Url::to(['commit-summary', 'id' => $project->id, 'commitId' => $commit->getId()])?>">
             <div class="col-md-4">
                 <?= ContributorLine::widget([
-                    'contributorName' => $commit->contributorName,
-                    'vcsType' => $project->repo_type,
+                    'contributor' => $contributorApi->getContributor($project->repo_type, $commit->contributorName, $commit->contributorEmail),
                     'avatarSize' => 'small',
                     'useLink' => false,
                 ]) ?><br />

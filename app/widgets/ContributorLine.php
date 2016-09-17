@@ -1,8 +1,9 @@
 <?php
-namespace user\widgets;
+namespace app\widgets;
 
-use user\models\User;
-use user\UserModule;
+use app\models\ContributorInterface;
+use app\models\UnregisteredContributor;
+use app\widgets\ContributorAvatar;
 use Yii;
 use yii\base\Widget;
 use yii\helpers\Html;
@@ -18,19 +19,9 @@ use yii\helpers\Html;
 class ContributorLine extends Widget
 {
     /**
-     * @var string
+     * @var ContributorInterface Contributor model
      */
-    public $contributorName;
-
-    /**
-     * @var string
-     */
-    public $contributorEmail;
-
-    /**
-     * @var string VCS type by UserAccount::TYPE_* constants
-     */
-    public $vcsType;
+    public $contributor;
 
     /**
      * @var string Avatar size: small, middle, normal
@@ -43,46 +34,26 @@ class ContributorLine extends Widget
     public $useLink = true;
 
     /**
-     * User model if user exists in a system.
-     *
-     * Or user model if already used in memory.
-     *
-     * @var User
+     * @var boolean Show email flag
      */
-    public $user;
+    public $showEmail = false;
 
     /**
-     * Retreive user model if it exists at database
-     */
-    public function init()
-    {
-        parent::init();
-
-        // get user model
-        /* @var $api UserModule */
-        $api = Yii::$app->getModule('user');
-
-        if (!($this->user instanceof User)) {
-            $this->user = $api->getUserByUsername($this->vcsType, $this->contributorName, $this->contributorEmail);
-        }
-    }
-
-    /**
-     * Render widget with user model
+     * Render widget as registered contributor
      *
      * @return string
      */
-    protected function renderWithUserModel()
+    protected function renderRegistered()
     {
-        $avatar =  UserAvatar::widget([
-            'user' => $this->user,
+        $avatar =  ContributorAvatar::widget([
+            'contributor' => $this->contributor,
             'size' => $this->avatarSize,
         ]);
         $text = $this->renderSimple(false);
 
         return $this->useLink ? $avatar . Html::a($text, '#', [
             'data' => [
-                'user-id' => $this->user->id,
+                'user-id' => $this->contributor->getContributorId(),
             ],
             'role' => 'user-popup-button',
         ]) : $avatar . $text;
@@ -100,15 +71,15 @@ class ContributorLine extends Widget
         $ret = '';
 
         if ($withAvatar) {
-            $ret .= UserAvatar::widget([
+            $ret .= ContributorAvatar::widget([
                 'size' => $this->avatarSize,
             ]);
         }
 
-        $ret .= Html::encode($this->contributorName);
+        $ret .= Html::encode($this->contributor->getContributorName());
 
-        if ($this->contributorEmail) {
-            $ret .= ' &lt;' . Html::encode($this->contributorEmail) . '&gt;';
+        if ($this->showEmail && ($email = $this->contributor->getContributorEmail()) !== false) {
+            $ret .= ' &lt;' . Html::encode($email) . '&gt;';
         }
 
         return $ret;
@@ -121,8 +92,8 @@ class ContributorLine extends Widget
      */
     public function run()
     {
-        if ($this->user instanceof User) {
-            return $this->renderWithUserModel();
+        if (!($this->contributor instanceof UnregisteredContributor)) {
+            return $this->renderRegistered();
         }
 
         return $this->renderSimple() . ' ' . Html::tag('span', Yii::t('user', 'Not registered'), [

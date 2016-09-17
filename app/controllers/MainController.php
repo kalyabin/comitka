@@ -47,7 +47,7 @@ class MainController extends Controller
      */
     public function actionReviews($type)
     {
-        $res = ContributionReview::find()->with('project', 'contributor')->orderBy([
+        $res = ContributionReview::find()->with('project')->orderBy([
             'date' => SORT_DESC,
         ]);
 

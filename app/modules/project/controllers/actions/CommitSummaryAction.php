@@ -1,6 +1,7 @@
 <?php
 namespace project\controllers\actions;
 
+use project\models\ContributionReview;
 use project\models\Project;
 use VcsCommon\BaseCommit;
 use VcsCommon\BaseRepository;
@@ -8,7 +9,6 @@ use VcsCommon\exception\CommonException;
 use Yii;
 use yii\base\Action;
 use yii\base\InvalidParamException;
-use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -71,10 +71,17 @@ class CommitSummaryAction extends Action
             ]), $ex->getCode(), $ex);
         }
 
+        // get contribution review model
+        $reviewModel = ContributionReview::find()->andWhere([
+            'project_id' => $this->project->id,
+            'commit_id' => $commit->getId(),
+        ])->one();
+
         return $this->controller->render('commit/summary', [
             'project' => $this->project,
             'repository' => $this->repository,
             'commit' => $commit,
+            'reviewModel' => $reviewModel   ,
         ]);
     }
 }

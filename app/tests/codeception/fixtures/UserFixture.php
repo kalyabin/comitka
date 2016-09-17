@@ -18,6 +18,7 @@ class UserFixture extends ActiveFixture
     {
         return [
             'activeUser1' => [
+                'id' => 1,
                 'name' => 'User1 Active',
                 'email' => 'user1@active.ru',
                 'password' => Yii::$app->getModule('user')->getPasswordHash('password_active_user_1'),
@@ -25,6 +26,7 @@ class UserFixture extends ActiveFixture
                 'avatar' => null,
             ],
             'activeUser2' => [
+                'id' => 2,
                 'name' => 'User2 Active',
                 'email' => 'user2@active.ru',
                 'password' => Yii::$app->getModule('user')->getPasswordHash('password_active_user_2'),

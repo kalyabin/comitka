@@ -3,7 +3,7 @@
 use user\models\ChangePasswordForm;
 use user\models\UserForm;
 use user\widgets\ProfileMenu;
-use user\widgets\UserAvatar;
+use app\widgets\ContributorAvatar;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 use yii\web\View;
@@ -30,10 +30,10 @@ $this->title = Yii::t('user', 'Your profile');
     <div class="panel-body">
         <?= $form->field($profileForm, 'email')->staticControl() ?>
         <?= $form->field($profileForm, 'name')->textInput() ?>
-        <?php if ($avatarUrl = $profileForm->getAvatarUrl()):?>
+        <?php if (($avatarUrl = $profileForm->getAvatarUrl()) !== false):?>
             <?php
-            $img = UserAvatar::widget([
-                'user' => $profileForm,
+            $img = ContributorAvatar::widget([
+                'contributor' => $profileForm,
                 'size' => 'normal',
                 'asBlock' => true,
             ]);
