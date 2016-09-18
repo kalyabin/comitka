@@ -32,67 +32,10 @@ class MainController extends Controller
     }
 
     /**
-     * Need to review contributions
-     *
-     * Type variable has states:
-     * - my-reviews - reviews to current contributor;
-     * - all-contributions - all contributions;
-     * - my-contributions - current user contributions;
-     * - no-reviewer - contributions without reviewer;
-     *
-     * @param string $type Contribution types
-     *
-     * @return mixed
-     *
-     * @throws \yii\web\NotFoundHttpException
-     */
-    public function actionReviews($type)
-    {
-        $res = ContributionReview::find()->with('project')->orderBy([
-            'date' => SORT_DESC,
-        ]);
-
-        if ($type == 'my-reviews') {
-            // contribution reviews to current contributor
-            $res->andWhere([
-                'reviewer_id' => Yii::$app->user->getId(),
-                'reviewed' => null,
-            ]);
-        } elseif ($type == 'all-contributions') {
-            // all contributions reviews
-            $res->andWhere([
-                'reviewed' => null,
-            ]);
-        } elseif ($type == 'my-contributions') {
-            // current contributor commits
-            $res->andWhere([
-                'contributor_id' => Yii::$app->user->getId(),
-            ]);
-        } elseif ($type == 'no-reviewer') {
-            // without reviewer
-            $res->andWhere([
-                'reviewer_id' => null,
-            ]);
-        } else {
-            throw new \yii\web\NotFoundHttpException();
-        }
-
-        $dataProvider = new ActiveDataProvider([
-            'id' => $type,
-            'query' => $res,
-            'sort' => false,
-        ]);
-
-        return $this->render('reviews', [
-            'dataProvider' => $dataProvider,
-        ]);
-    }
-
-    /**
      * Application index
      */
     public function actionIndex()
     {
-        return $this->redirect(['reviews', 'type' => 'my-reviews']);
+        return $this->redirect(['/project/contribution-review/list', 'type' => 'my-reviews']);
     }
 }

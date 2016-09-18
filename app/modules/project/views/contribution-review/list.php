@@ -19,19 +19,19 @@ $this->title = Yii::t('main', 'Contributions');
     'options' => ['class' => 'nav nav-tabs'],
     'items' => [
         [
-            'url' => ['main/reviews', 'type' => 'my-reviews'],
+            'url' => ['/project/contribution-review/list', 'type' => 'my-reviews'],
             'label' => Yii::t('main', 'My reviews'),
         ],
         [
-            'url' => ['main/reviews', 'type' => 'my-contributions'],
+            'url' => ['/project/contribution-review/list', 'type' => 'my-contributions'],
             'label' => Yii::t('main', 'My contributions'),
         ],
         [
-            'url' => ['main/reviews', 'type' => 'all-contributions'],
+            'url' => ['/project/contribution-review/list', 'type' => 'all-contributions'],
             'label' => Yii::t('main', 'All contributions'),
         ],
         [
-            'url' => ['main/reviews', 'type' => 'no-reviewer'],
+            'url' => ['/project/contribution-review/list', 'type' => 'no-reviewer'],
             'label' => Yii::t('main', 'Contributions without reviewer'),
         ]
     ],

@@ -34,6 +34,27 @@ CommonAsset::register($this);
     ]);
     $navItems = [
         [
+            'label' => Yii::t('project', 'Reviews'),
+            'items' => [
+                [
+                    'url' => ['/project/contribution-review/list', 'type' => 'my-reviews'],
+                    'label' => Yii::t('main', 'My reviews'),
+                ],
+                [
+                    'url' => ['/project/contribution-review/list', 'type' => 'my-contributions'],
+                    'label' => Yii::t('main', 'My contributions'),
+                ],
+                [
+                    'url' => ['/project/contribution-review/list', 'type' => 'all-contributions'],
+                    'label' => Yii::t('main', 'All contributions'),
+                ],
+                [
+                    'url' => ['/project/contribution-review/list', 'type' => 'no-reviewer'],
+                    'label' => Yii::t('main', 'Contributions without reviewer'),
+                ]
+            ],
+        ],
+        [
             'label' => Yii::t('project', 'Projects'),
             'url' => ['/project/project/index'],
         ],
