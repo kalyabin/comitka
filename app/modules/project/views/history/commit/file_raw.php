@@ -17,7 +17,7 @@ use yii\web\View;
 /* @var $isBinary boolean */
 ?>
 
-<?php if ($isBinary && $project->repo_type === Project::REPO_GIT):?>
+<?php if ($isBinary):?>
     <p><?= Yii::t('project', 'View <a href="{link}" target="_blank">binary file</a>', [
         'link' => Url::to(['/project/history/file-view',
             'id' => $project->id,
@@ -25,10 +25,6 @@ use yii\web\View;
             'filePath' => $path,
             'mode' => FileViewAction::MODE_RAW_BINARY,
         ])
-    ]) ?></p>
-<?php elseif ($isBinary):?>
-    <p><?= Yii::t('project', 'Binary file {path} has changed', [
-        'path' => $path,
     ]) ?></p>
 <?php else:?>
 <pre class="raw-file"><?= Html::encode($fileContents) ?></pre>
