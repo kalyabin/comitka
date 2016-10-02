@@ -60,7 +60,8 @@ class CommitPanel extends Widget
      */
     protected function renderParentsIds()
     {
-        if (($parents = $this->commit->getParentsId()) !== false) {
+        $parents = $this->commit->getParentsId();
+        if (!empty($parents)) {
             $ret = ' (';
 
             $ret .= Yii::t('project', 'parents') . ': ';
