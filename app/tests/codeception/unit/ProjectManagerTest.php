@@ -115,7 +115,7 @@ class ProjectManagerTest extends Unit
         $model = $this->getModule('Yii2')->grabFixture('projects', 'comitkaGitProject');
 
         $model->title = 'New repo title';
-        $this->assertTrue($model->validate());
+        $this->assertTrue($model->validate(), 'Errors: ' . print_r($model->getErrors(), true), 'Attributes: ' . print_r($model->getAttributes(), true));
         $this->assertTrue($model->save());
 
         return $model;
