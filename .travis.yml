@@ -31,4 +31,4 @@ before_script:
   - hg --version
 script:
   - cd app/tests
-  - php $HOME/.composer/vendor/bin/codecept run unit
+  - php codecept run unit
