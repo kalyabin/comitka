@@ -30,4 +30,4 @@ before_script:
   - git --version
   - hg --version
 script:
-  - cd app/tests && ./vendor/codeception/codeception/codecept run unit --debug --steps
+  - cd app/tests && pwd && ../../vendor/codeception/codeception/codecept run unit --debug --steps
