@@ -26,8 +26,9 @@ before_script:
   - mysql -e "create database comitka_tests;"
   - cp app/tests/codeception/config/common.local.travis.php app/tests/codeception/config/common.local.php
   - cp app/tests/codeception/config/unit.local.travis.php app/tests/codeception/config/unit.local.php
+  - cp app/tests/codeception.yml.dist app/tests/codeception.yml
   - app/tests/codeception/bin/yii migrate --interactive=0
   - git --version
   - hg --version
 script:
-  - cd app/tests && pwd && ../../vendor/codeception/codeception/codecept run unit --debug --steps
+  - codecept run unit --config=app/tests/codeception.yml --debug --steps
