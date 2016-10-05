@@ -31,4 +31,6 @@ before_script:
   - git --version
   - hg --version
 script:
+  - phpunit --debug --configuration=vendor/kalyabin/yii2-git-view/phpunit.xml
+  - phpunit --debug --configuration=vendor/kalyabin/yii2-hg-view/phpunit.xml
   - codecept run unit --config=app/tests/codeception.yml --debug --steps

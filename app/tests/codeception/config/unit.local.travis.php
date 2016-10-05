@@ -1,12 +1,13 @@
 <?php
 /**
- * Unit test local config
+ * Unit test local config for travis CI
  */
+
 return [
     'params' => [
         'testingVariables' => [
-            'gitProjectPath' => '/Users/max/www/comitka/web',
-            'hgProjectPath' => '/Users/max/www/metallurg/htdocs',
+            'gitProjectPath' => realpath(__DIR__ . '/../../../../vendor/kalyabin/yii2-git-view/tests/repo/testing-repo'),
+            'hgProjectPath' => realpath(__DIR__ . '/../../../../vendor/kalyabin/yii2-hg-view/tests/repo/testing-repo'),
         ],
     ],
 ];
