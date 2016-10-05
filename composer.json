@@ -19,21 +19,9 @@
         "yiisoft/yii2-gii": "*",
         "yiisoft/yii2-debug": "*",
         "phpunit/phpunit": "*",
-        "codeception/codeception": "*"
+        "codeception/codeception": "~2.2"
     },
     "repositories": [
-        {
-            "type": "package",
-            "package": {
-                "name": "codeception/codeception",
-                "version": "dev-master",
-                "source": {
-                    "url": "https://github.com/kalyabin/Codeception",
-                    "type": "git",
-                    "reference": "master"
-                }
-            }
-        },
         {
             "type": "package",
             "package": {

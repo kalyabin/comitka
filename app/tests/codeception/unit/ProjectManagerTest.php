@@ -19,7 +19,7 @@ class ProjectManagerTest extends Unit
     /**
      * Tests fixtures
      */
-    public function fixtures()
+    public function _fixtures()
     {
         return [
             'projects' => ProjectFixture::className(),

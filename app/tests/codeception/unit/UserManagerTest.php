@@ -31,7 +31,7 @@ class UserManagerTest extends Unit
     /**
      * Test fixtures
      */
-    public function fixtures()
+    public function _fixtures()
     {
         return [
             'users' => UserFixture::className(),

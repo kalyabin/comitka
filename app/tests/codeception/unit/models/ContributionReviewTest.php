@@ -23,7 +23,7 @@ class ContributionReviewTest extends Unit
     /**
      * Tests fixtures
      */
-    public function fixtures()
+    public function _fixtures()
     {
         return [
             'users' => UserFixture::className(),
