@@ -3,11 +3,14 @@
  * Unit test local config for travis CI
  */
 
+$gitProjectPath = require __DIR__ . '/../../../../vendor/kalyabin/yii2-git-view/tests/create_repository.php';
+$hgProjectPath = require __DIR__ . '/../../../../vendor/kalyabin/yii2-hg-view/tests/create_repository.php';
+
 return [
     'params' => [
         'testingVariables' => [
-            'gitProjectPath' => realpath(__DIR__ . '/../../../../vendor/kalyabin/yii2-git-view/tests/repo/testing-repo'),
-            'hgProjectPath' => realpath(__DIR__ . '/../../../../vendor/kalyabin/yii2-hg-view/tests/repo/testing-repo'),
+            'gitProjectPath' => $gitProjectPath,
+            'hgProjectPath' => $hgProjectPath,
         ],
     ],
 ];
