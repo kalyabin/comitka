@@ -5,6 +5,9 @@ php:
   - '7.0'
   - hhvm
   - nightly
+os:
+  - linux
+  - osx
 sudo: false
 services:
   - mysql
