@@ -24,8 +24,12 @@ return \yii\helpers\ArrayHelper::merge($common, [
     'controllerNamespace' => 'app\commands',
     'components' => [
         'urlManager' => [
-            'hostInfo' => $common['params']['local']['host']['info'],
-            'baseUrl' => $common['params']['local']['host']['baseUrl'],
+            'hostInfo' => isset($common['params']['local']['host']['info']) ?
+                $common['params']['local']['host']['info'] :
+                '',
+            'baseUrl' => isset($common['params']['local']['host']['baseUrl']) ?
+                $common['params']['local']['host']['baseUrl'] :
+                '',
         ],
     ],
 ], $localCfg);

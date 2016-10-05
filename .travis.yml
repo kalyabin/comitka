@@ -1,0 +1,32 @@
+language: php
+php:
+  - '5.5'
+  - '5.6'
+  - '7.0'
+  - hhvm
+  - nightly
+sudo: false
+services:
+  - mysql
+matrix:
+  allow_failures:
+    - php: hhvm # need to check git show command for this tests
+cache:
+  directories:
+    - vendor
+    - $HOME/.composer/cache
+install:
+  - phpenv config-rm xdebug.ini || echo "xdebug is not installed"
+  - travis_retry composer self-update && composer --version
+  - travis_retry composer global require "fxp/composer-asset-plugin:^1.2.0"
+  - export PATH="$HOME/.composer/vendor/bin:$PATH"
+  - travis_retry composer update --prefer-dist
+before_script:
+  - mysql -e "create database comitka_tests;"
+  - cp app/tests/codeception/config/common.local.travis.php app/tests/codeception/config/common.local.php
+  - cp app/tests/codeception/config/unit.local.travis.php app/tests/codeception/config/unit.local.php
+  - app/tests/codeception/bin/yii migrate
+  - git --version
+  - hg --version
+script:
+  - vendor/bin/codecept --config=app/tests/codeception.yml run unit

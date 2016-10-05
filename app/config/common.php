@@ -10,6 +10,19 @@ $localParams = include __DIR__ . '/params.php';
 // rewrite common using local config
 $localCfg = is_file(__DIR__ . '/common.local.php') ? include __DIR__ . '/common.local.php' : [];
 
+if (isset($localParams['db'])) {
+    // rewrite database connection params
+    $localCfg = ArrayHelper::merge([
+        'components' => [
+            'db' => [
+                'dsn' => "mysql:host={$localParams['db']['host']};dbname={$localParams['db']['name']}",
+                'username' => $localParams['db']['username'],
+                'password' => $localParams['db']['password'],
+            ],
+        ],
+    ], $localCfg);
+}
+
 $mailerConfig = [
     'class' => 'app\components\Mailer',
     'useFileTransport' => !isset($localParams['smtp']) && defined('YII_ENV_DEV') && YII_ENV_DEV === true,
@@ -71,9 +84,6 @@ return ArrayHelper::merge([
             'class' => 'yii\db\Connection',
             'charset' => 'utf8',
             'tablePrefix' => 'app_',
-            'dsn' => "mysql:host={$localParams['db']['host']};dbname={$localParams['db']['name']}",
-            'username' => $localParams['db']['username'],
-            'password' => $localParams['db']['password'],
         ],
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
