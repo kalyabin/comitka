@@ -28,5 +28,4 @@ before_script:
   - git --version
   - hg --version
 script:
-  - cd app/tests
-  - php codecept run unit
+  - php vendor/codeception/codeception/codecept run unit --config=app/tests --debug --steps
