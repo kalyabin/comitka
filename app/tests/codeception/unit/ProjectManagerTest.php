@@ -38,7 +38,7 @@ class ProjectManagerTest extends Unit
         $this->assertFalse($model->validate());
         $this->assertArrayHasKey('repo_path', $model->getErrors(), 'Check repo_path validation');
 
-        $model->repo_path = '/root/';
+        $model->repo_path = substr_compare(PHP_OS, 'win', 0, 3, true) === 0 ? 'C:\\' : '/root/';
         $this->assertFalse($model->validate());
         $this->assertArrayHasKey('repo_path', $model->getErrors(), 'Check repo_path validation');
 

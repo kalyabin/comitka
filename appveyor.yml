@@ -6,8 +6,8 @@ platform:
   - Any CPU
 cache:
   - c:\tools\php
-  - c:\projects\kalyabin-comitka\vendor -> composer.lock
-  - '%LOCALAPPDATA%\Composer\files -> composer.lock'
+  - c:\projects\comitka\vendor
+  - %LOCALAPPDATA%\Composer\files
 services:
   - mysql
 init:
