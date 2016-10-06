@@ -32,7 +32,7 @@ install:
   - php composer.phar config -g github-oauth.github.com %GITHUB_PUBLIC_TOKEN%
   - php composer.phar global require "fxp/composer-asset-plugin:~1.2.0" --no-interaction --no-progress
   - php composer.phar global require "codeception/codeception:~2.2" --no-interaction --no-progress
-  - php composer.phar update --no-interaction --prefer-dist  --no-progress
+  - php composer.phar update --no-interaction --prefer-dist  --no-progress --no-ansi
 before_test:
   - mysql -uroot -pPassword12! -e "CREATE DATABASE comitka_tests"
   - cd %APPVEYOR_BUILD_FOLDER%\app\tests\codeception\config
@@ -40,7 +40,7 @@ before_test:
   - copy /Y unit.local.sample.php unit.local.php
   - cd %APPVEYOR_BUILD_FOLDER%\app\tests
   - copy /Y codeception.yml.dist codeception.yml
-  - cd %APPVEYOR_BUILD_FOLDER%\tests\codeception\bin
+  - cd %APPVEYOR_BUILD_FOLDER%\app\tests\codeception\bin
   - yii.bat migrate --interactive=0
   - git --version
   - hg --version
