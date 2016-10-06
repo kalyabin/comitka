@@ -119,7 +119,7 @@ class Project extends ActiveRecord
             // windows flag
             $isWindows = strtoupper(substr(PHP_OS, 0, 3)) == 'WIN';
             if (
-                ($isWindows && !preg_match('#^[A-Z]{1}\:\/#', $path)) ||
+                ($isWindows && !preg_match('#^[A-Z]{1}\:#i', $path)) ||
                 (!$isWindows && !StringHelper::startsWith($path, DIRECTORY_SEPARATOR))
             ) {
                 // path must be absolute
