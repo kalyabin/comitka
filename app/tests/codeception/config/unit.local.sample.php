@@ -5,8 +5,9 @@
 return [
     'params' => [
         'testingVariables' => [
-            'gitProjectPath' => '/Users/max/www/comitka/web',
-            'hgProjectPath' => '/Users/max/www/metallurg/htdocs',
+            // save it for continuous integration
+            'gitProjectPath' => GIT_PROJECT_PATH,
+            'hgProjectPath' => HG_PROJECT_PATH,
         ],
     ],
 ];

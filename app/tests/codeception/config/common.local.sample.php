@@ -5,9 +5,10 @@
 return [
     'components' => [
         'db' => [
-            'dsn' => 'mysql:host=localhost;dbname=tests',
-            'username' => '',
-            'password' => '',
+            // save this config for continuous integration
+            'dsn' => 'mysql:host=localhost;dbname=comitka_tests',
+            'username' => 'root',
+            'password' => getenv('APPVEYOR') ? 'Password12!' : '',
         ],
     ],
 ];

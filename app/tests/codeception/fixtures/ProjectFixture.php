@@ -19,7 +19,7 @@ class ProjectFixture extends ActiveFixture
             'comitkaGitProject' => [
                 'title' => 'Comitka',
                 'repo_type' => 'git',
-                'repo_path' => require YII_APP_BASE_PATH . '/../vendor/kalyabin/yii2-git-view/tests/create_repository.php',
+                'repo_path' => GIT_PROJECT_PATH,
             ],
         ];
     }
