@@ -7,7 +7,7 @@ platform:
 cache:
   - c:\tools\php
   - c:\projects\comitka\vendor
-  - %LOCALAPPDATA%\Composer\files
+  - '%LOCALAPPDATA%\Composer\files'
 services:
   - mysql
 init:
