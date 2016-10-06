@@ -35,12 +35,16 @@ install:
   - php composer.phar update --no-interaction --prefer-dist  --no-progress
 before_test:
   - mysql -uroot -pPassword12! -e "CREATE DATABASE comitka_tests"
-  - copy app/tests/codeception/config/common.local.sample.php app/tests/codeception/config/common.local.php
-  - copy app/tests/codeception/config/unit.local.sample.php app/tests/codeception/config/unit.local.php
-  - copy app/tests/codeception.yml.dist app/tests/codeception.yml
-  - app/tests/codeception/bin/yii.bat migrate --interactive=0
+  - cd %APPVEYOR_BUILD_FOLDER%\app\tests\codeception\config
+  - copy /Y common.local.sample.php common.local.php
+  - copy /Y unit.local.sample.php unit.local.php
+  - cd %APPVEYOR_BUILD_FOLDER%\app\tests
+  - copy /Y codeception.yml.dist codeception.yml
+  - cd %APPVEYOR_BUILD_FOLDER%\tests\codeception\bin
+  - yii.bat migrate --interactive=0
   - git --version
   - hg --version
   - php --version
+  - cd %APPVEYOR_BUILD_FOLDER%
 test_script:
   - vendor/codeception/codeception/codecept.bat run unit --config=app/tests/codeception.yml --debug --steps
