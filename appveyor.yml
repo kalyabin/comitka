@@ -6,7 +6,8 @@ platform:
   - Any CPU
 cache:
   - c:\tools\php
-  - c:\Users\appveyor\AppData\Roaming\Composer\vendor
+  - c:\projects\kalyabin-comitka\vendor -> composer.lock
+  - '%LOCALAPPDATA%\Composer\files -> composer.lock'
 services:
   - mysql
 init:
@@ -18,6 +19,9 @@ init:
 install:
   - IF EXIST c:\tools\php (SET PHP=0)
   - IF %PHP%==1 cinst -y OpenSSL.Light
+  - SET PATH=C:\Program Files\OpenSSL;%PATH%
+  - cinst -y curl
+  - SET PATH=C:\Program Files\curl;%PATH%
   - IF %PHP%==1 cinst -y php
   - cd c:\tools\php
   - IF %PHP%==1 copy php.ini-production php.ini /Y
@@ -25,6 +29,7 @@ install:
   - IF %PHP%==1 echo extension_dir=ext >> php.ini
   - IF %PHP%==1 echo extension=php_openssl.dll >> php.ini
   - IF %PHP%==1 echo extension=php_mbstring.dll >> php.ini
+  - IF %PHP%==1 echo extension=php_curl.dll >> php.ini
   - IF %PHP%==1 echo extension=php_fileinfo.dll >> php.ini
   - IF %PHP%==1 echo extension=php_pdo_mysql.dll >> php.ini
   - cd %APPVEYOR_BUILD_FOLDER%
