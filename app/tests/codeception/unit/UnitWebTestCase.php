@@ -19,7 +19,7 @@ abstract class UnitWebTestCase extends Unit
     protected $appConfig = [
         'request' => [
             'cookieValidationKey' => 'zAcJxMF2k1vQFD9',
-            'scriptFile' => __DIR__ .'/index.php',
+            'scriptFile' => '/index.php',
             'scriptUrl' => '/index.php',
         ],
         'assetManager' => [

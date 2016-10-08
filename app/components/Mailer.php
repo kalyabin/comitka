@@ -14,7 +14,11 @@ class Mailer extends BaseMailer
      */
     public function compose($view = null, array $params = array())
     {
-        return parent::compose($view, $params)
-            ->setFrom(Yii::$app->params['local']['emailFrom']);
+        if (isset(Yii::$app->params['local']['emailFrom'])) {
+            return parent::compose($view, $params)
+                ->setFrom(Yii::$app->params['local']['emailFrom']);
+        }
+
+        return parent::compose();
     }
 }
