@@ -35,9 +35,9 @@ install:
   - cd %APPVEYOR_BUILD_FOLDER%
   - appveyor DownloadFile https://getcomposer.org/composer.phar
   - php composer.phar config -g github-oauth.github.com %GITHUB_PUBLIC_TOKEN%
-  - php composer.phar global require "fxp/composer-asset-plugin:~1.2.0" --no-interaction --no-progress  --no-ansi
-  - php composer.phar global require "codeception/codeception:~2.2" --no-interaction --no-progress --no-ansi
-  - php composer.phar update --no-interaction --prefer-dist  --no-progress --no-ansi
+  - php composer.phar global require "fxp/composer-asset-plugin:~1.2.0" --no-interaction --no-progress  --no-ansi --quiet
+  - php composer.phar global require "codeception/codeception:~2.2" --no-interaction --no-progress --no-ansi --quiet
+  - php composer.phar update --no-interaction --prefer-dist  --no-progress --no-ansi --quiet
 before_test:
   - mysql -uroot -pPassword12! -e "CREATE DATABASE comitka_tests"
   - cd %APPVEYOR_BUILD_FOLDER%\app\tests\codeception\config
