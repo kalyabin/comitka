@@ -1,8 +1,11 @@
 <?php
 
+namespace api;
+
 use app\components\ContributorApi;
-use Codeception\Test\Unit;
 use tests\codeception\fixtures\UserFixture;
+use UnitTestCase;
+use UnitTester;
 use user\models\ChangePasswordForm;
 use user\models\SignInForm;
 use user\models\User;
@@ -10,13 +13,14 @@ use user\models\UserAccount;
 use user\models\UserAccountForm;
 use user\models\UserForm;
 use user\UserModule;
+use Yii;
 
 /**
  * Test user manager: create user, update user and remove him
  *
  * @method User users(string $userKey) Get user fixture
  */
-class UserManagerTest extends Unit
+class UserManagerTest extends UnitTestCase
 {
     /**
      * @var UnitTester
@@ -43,8 +47,8 @@ class UserManagerTest extends Unit
      */
     public function setUp()
     {
-        $this->userModule = Yii::$app->getModule('user');
         parent::setUp();
+        $this->userModule = Yii::$app->getModule('user');
     }
 
     /**

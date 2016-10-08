@@ -311,7 +311,7 @@ class User extends ActiveRecord implements IdentityInterface, ContributorInterfa
      */
     public function getAvatarUrl()
     {
-        return is_file(Yii::getAlias(self::AVATAR_PATH . $this->avatar)) ? self::AVATAR_URL . $this->avatar : null;
+        return $this->avatar ? self::AVATAR_URL . $this->avatar : null;
     }
 
     /**

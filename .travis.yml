@@ -28,6 +28,8 @@ before_script:
   - cp app/tests/codeception/config/unit.local.sample.php app/tests/codeception/config/unit.local.php
   - cp app/tests/codeception.yml.dist app/tests/codeception.yml
   - app/tests/codeception/bin/yii migrate --interactive=0
+  - php vendor/kalyabin/yii2-git-view/tests/create_repository.php
+  - php vendor/kalyabin/yii2-hg-view/tests/create_repository.php
   - git --version
   - hg --version
 script:

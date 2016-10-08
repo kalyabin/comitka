@@ -1,19 +1,18 @@
 <?php
 namespace models;
 
-use Codeception\Test\Unit;
 use project\models\ContributionReview;
 use project\models\Project;
 use tests\codeception\fixtures\ProjectFixture;
 use tests\codeception\fixtures\UserFixture;
+use UnitTestCase;
 use UnitTester;
 use user\models\User;
-use Yii;
 
 /**
  * Test ContributionReview model
  */
-class ContributionReviewTest extends Unit
+class ContributionReviewTest extends UnitTestCase
 {
     /**
      * @var UnitTester
@@ -83,7 +82,7 @@ class ContributionReviewTest extends Unit
                     'isValid' => false,
                 ],
                 [
-                    'value' => $this->getModule('Yii2')->grabFixture('projects', 'comitkaGitProject')->id,
+                    'value' => $this->getModule('Yii2')->grabFixture('projects', 'gitProject')->id,
                     'isValid' => true,
                 ]
             ],
@@ -307,7 +306,7 @@ class ContributionReviewTest extends Unit
         $this->assertTrue($model->save());
 
         $this->assertInstanceOf(Project::className(), $model->project);
-        $this->assertEquals($model->project->id, $this->getModule('Yii2')->grabFixture('projects', 'comitkaGitProject')->id);
+        $this->assertEquals($model->project->id, $this->getModule('Yii2')->grabFixture('projects', 'gitProject')->id);
 
         $this->assertInstanceOf(User::className(), $model->contributor);
         $this->assertEquals($model->contributor->id, $this->getModule('Yii2')->grabFixture('users', 'activeUser1')->id);

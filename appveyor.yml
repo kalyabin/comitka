@@ -47,9 +47,11 @@ before_test:
   - copy /Y codeception.yml.dist codeception.yml
   - cd %APPVEYOR_BUILD_FOLDER%\app\tests\codeception\bin
   - yii.bat migrate --interactive=0
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - php vendor/kalyabin/yii2-git-view/tests/create_repository.php
+  - php vendor/kalyabin/yii2-hg-view/tests/create_repository.php
   - git --version
   - hg --version
   - php --version
-  - cd %APPVEYOR_BUILD_FOLDER%
 test_script:
   - vendor/bin/codecept run unit --config=app/tests/codeception.yml --debug --steps

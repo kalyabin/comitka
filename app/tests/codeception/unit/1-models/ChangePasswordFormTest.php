@@ -1,15 +1,14 @@
 <?php
 namespace models;
 
-use Codeception\Test\Unit;
+use UnitTestCase;
 use UnitTester;
 use user\models\ChangePasswordForm;
-use Yii;
 
 /**
  * Test change password form model
  */
-class ChangePasswordFormTest extends Unit
+class ChangePasswordFormTest extends UnitTestCase
 {
     /**
      * @var UnitTester

@@ -34,7 +34,6 @@ $this->title = Html::encode($model->name);
 
 <?php
 $this->blocks['left_block'] = UserMenu::widget([
-    'authUser' => Yii::$app->user->identity,
     'model' => $model,
     'options' => [
         'class' => 'nav nav-pills nav-stacked',

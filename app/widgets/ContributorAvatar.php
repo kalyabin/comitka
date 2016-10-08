@@ -26,7 +26,9 @@ class ContributorAvatar extends Widget
     public $asBlock = false;
 
     /**
+     * Run widget
      *
+     * @return string
      */
     public function run()
     {

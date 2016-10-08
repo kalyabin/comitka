@@ -1,20 +1,25 @@
 <?php
 
+namespace api;
+
 use app\models\ContributorInterface;
 use app\models\UnregisteredContributor;
-use Codeception\Test\Unit;
+use DateTime;
 use project\models\ContributionReview;
 use project\models\Project;
 use project\ProjectModule;
 use tests\codeception\fixtures\ProjectFixture;
 use tests\codeception\fixtures\UserFixture;
+use UnitTestCase;
+use UnitTester;
 use user\models\User;
 use VcsCommon\BaseCommit;
+use Yii;
 
 /**
  * Tests project helpers
  */
-class ProjectApiTest extends Unit
+class ProjectApiTest extends UnitTestCase
 {
     /**
      * @var UnitTester
@@ -39,8 +44,8 @@ class ProjectApiTest extends Unit
 
     public function setUp()
     {
-        $this->projectApi = Yii::$app->getModule('project');
         parent::setUp();
+        $this->projectApi = Yii::$app->getModule('project');
     }
 
     /**
@@ -51,7 +56,7 @@ class ProjectApiTest extends Unit
     public function testGetProjectContributions()
     {
         /* @var $project Project */
-        $project = $this->getModule('Yii2')->grabFixture('projects', 'comitkaGitProject');
+        $project = $this->getModule('Yii2')->grabFixture('projects', 'gitProject');
 
         $dateFrom = new DateTime();
 
@@ -82,7 +87,7 @@ class ProjectApiTest extends Unit
     public function testCreateContributionReview(BaseCommit $commit)
     {
         /* @var $project Project */
-        $project = $this->getModule('Yii2')->grabFixture('projects', 'comitkaGitProject');
+        $project = $this->getModule('Yii2')->grabFixture('projects', 'gitProject');
         /* @var $reviewer User */
         $reviewer = $this->getModule('Yii2')->grabFixture('users', 'activeUser1');
         /* @var $contributor User */

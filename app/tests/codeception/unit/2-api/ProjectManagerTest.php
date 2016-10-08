@@ -1,15 +1,19 @@
 <?php
 
-use Codeception\Test\Unit;
+namespace api;
+
 use GitView\Repository as GitRepository;
 use HgView\Repository as HgRepository;
 use project\models\Project;
 use tests\codeception\fixtures\ProjectFixture;
+use UnitTestCase;
+use UnitTester;
+use Yii;
 
 /**
  * Tests project: create, update, get repository instance and delete
  */
-class ProjectManagerTest extends Unit
+class ProjectManagerTest extends UnitTestCase
 {
     /**
      * @var UnitTester
@@ -112,7 +116,7 @@ class ProjectManagerTest extends Unit
     public function testUpdateProject()
     {
         /* @var $model Project */
-        $model = $this->getModule('Yii2')->grabFixture('projects', 'comitkaGitProject');
+        $model = $this->getModule('Yii2')->grabFixture('projects', 'gitProject');
 
         $model->title = 'New repo title';
         $this->assertTrue($model->validate(), 'Errors: ' . print_r($model->getErrors(), true), 'Attributes: ' . print_r($model->getAttributes(), true));
@@ -130,7 +134,7 @@ class ProjectManagerTest extends Unit
      */
     public function testGetRepository()
     {
-        $project = $this->getModule('Yii2')->grabFixture('projects', 'comitkaGitProject');
+        $project = $this->getModule('Yii2')->grabFixture('projects', 'gitProject');
 
         // change repo path to HG first
         $project->repo_path = Yii::$app->params['testingVariables']['hgProjectPath'];
@@ -154,7 +158,7 @@ class ProjectManagerTest extends Unit
      */
     public function testRemoveProject()
     {
-        $model = $this->getModule('Yii2')->grabFixture('projects', 'comitkaGitProject');
+        $model = $this->getModule('Yii2')->grabFixture('projects', 'gitProject');
         $result = $model->delete();
         $this->assertEquals(1, $result);
     }

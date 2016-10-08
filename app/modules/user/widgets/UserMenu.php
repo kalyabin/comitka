@@ -14,11 +14,6 @@ use yii\bootstrap\Nav;
 class UserMenu extends Nav
 {
     /**
-     * @var User Currently authorized user
-     */
-    public $authUser;
-
-    /**
      * @var User The user's model to form a menu
      */
     public $model;
@@ -28,9 +23,6 @@ class UserMenu extends Nav
      */
     public function init()
     {
-        if (!$this->authUser instanceof User) {
-            throw new InvalidParamException('AuthUser must be an instance of ' . User::className());
-        }
         if (!$this->model instanceof User) {
             throw new InvalidParamException('Model must be an instance of ' . User::className());
         }

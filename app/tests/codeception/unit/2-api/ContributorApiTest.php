@@ -1,18 +1,22 @@
 <?php
 
+namespace api;
+
 use app\components\ContributorApi;
 use app\models\ContributorInterface;
 use app\models\UnregisteredContributor;
-use Codeception\Test\Unit;
 use tests\codeception\fixtures\UserAccountFixture;
 use tests\codeception\fixtures\UserFixture;
+use UnitTestCase;
+use UnitTester;
 use user\models\User;
 use user\models\UserAccount;
+use Yii;
 
 /**
  * Tests contributor helpers
  */
-class ContributorApiTest extends Unit
+class ContributorApiTest extends UnitTestCase
 {
     /**
      * @var UnitTester
@@ -37,8 +41,8 @@ class ContributorApiTest extends Unit
 
     public function setUp()
     {
-        $this->contributorApi = Yii::$app->contributors;
         parent::setUp();
+        $this->contributorApi = Yii::$app->contributors;
     }
 
     /**

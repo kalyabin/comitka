@@ -16,7 +16,7 @@ class ProjectFixture extends ActiveFixture
     public function getData()
     {
         return [
-            'comitkaGitProject' => [
+            'gitProject' => [
                 'title' => 'Comitka',
                 'repo_type' => 'git',
                 'repo_path' => GIT_PROJECT_PATH,

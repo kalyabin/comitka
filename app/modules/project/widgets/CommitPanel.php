@@ -5,7 +5,7 @@ use app\models\ContributorInterface;
 use app\widgets\ContributorLine;
 use project\models\ContributionReview;
 use project\models\Project;
-use user\components\Auth;
+use yii\web\User;
 use VcsCommon\BaseCommit;
 use Yii;
 use yii\base\Widget;
@@ -35,7 +35,7 @@ class CommitPanel extends Widget
     public $contributor;
 
     /**
-     * @var Auth Authorized user
+     * @var User Authorized user
      */
     public $authUser;
 

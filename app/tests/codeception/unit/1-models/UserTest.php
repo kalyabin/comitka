@@ -1,8 +1,8 @@
 <?php
 namespace models;
 
-use Codeception\Test\Unit;
 use tests\codeception\fixtures\UserFixture;
+use UnitTestCase;
 use UnitTester;
 use user\models\User;
 use user\models\UserAccount;
@@ -11,7 +11,7 @@ use user\models\UserChecker;
 /**
  * Test user model
  */
-class UserTest extends Unit
+class UserTest extends UnitTestCase
 {
     /**
      * @var UnitTester
