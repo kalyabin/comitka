@@ -14,8 +14,6 @@ return ArrayHelper::merge(include YII_APP_BASE_PATH . '/config/console.php', [
             'username' => 'root',
             'password' => getenv('APPVEYOR') ? 'Password12!' : '',
         ],
-    ],
-    'components' => [
         'mailer' => [
             'useFileTransport' => true,
         ],
