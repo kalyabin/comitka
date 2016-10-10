@@ -13,7 +13,7 @@ use VcsCommon\File;
 /**
  * Test revision file widget
  */
-class RevisionFileWidget extends UnitWebTestCase
+class RevisionFileTest extends UnitWebTestCase
 {
     /**
      * Fixtures
