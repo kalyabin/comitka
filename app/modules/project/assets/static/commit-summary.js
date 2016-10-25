@@ -74,13 +74,23 @@
              * Open a file view modal
              */
             $(options.fileLinkSelector).click(function(e) {
+
                 // clear other details
                 $(options.fileContentSelector).html('');
-                openFileView($(this).data('params'), $(this).data('container'));
-                location.hash = $(this).data('mode') + '/' + $(this).data('container');
+                var hash = $(this).data('mode') + '/' + $(this).data('container');
                 // mark link as single active
                 $(options.fileLinkSelector).removeClass(options.fileLinkActiveClass);
-                $(this).addClass(options.fileLinkActiveClass);
+
+                if (location.hash === '#' + hash) {
+                    //Close review block
+                    location.hash = '';
+                } else {
+                    //Open review block
+                    openFileView($(this).data('params'), $(this).data('container'));
+                    location.hash = $(this).data('mode') + '/' + $(this).data('container');
+                    $(this).addClass(options.fileLinkActiveClass);
+                }
+
                 e.preventDefault();
             });
 
