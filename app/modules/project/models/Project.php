@@ -3,6 +3,7 @@
 namespace project\models;
 
 use GitView\GitWrapper;
+use HgView\HgWrapper;
 use VcsCommon\BaseRepository;
 use VcsCommon\exception\CommonException;
 use Yii;

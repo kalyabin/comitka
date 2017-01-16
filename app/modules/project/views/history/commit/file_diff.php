@@ -39,7 +39,10 @@ use yii\web\View;
                 $a = $type === 'del' || $type === 'old' ? $aNum : null;
                 $b = $type === 'new' || $type === 'old' ? $bNum : null;
                 ?>
-                <tr class="row-<?= $type ?><?php if ($n === count($group['lines']) - 1):?> last-line<?php endif;?>">
+                <tr
+                    class="js-commit-row row-<?= $type ?><?php if ($n === count($group['lines']) - 1):?> last-line<?php endif;?>"
+                    data-row-number="<?=$n?>"
+                >
                     <td width="10" class="cell-a-num"><?= $a ? $a : '+' ?></td>
                     <td width="10" class="cell-b-num"><?= $b ? $b : '-' ?></td>
                     <td class="cell-content"><?= $line ?></td>

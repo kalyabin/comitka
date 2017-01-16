@@ -62,6 +62,8 @@ $jsOptions = [
     'fileLinkActiveClass' => 'active',
     'commitPanelSelector' => '.js-commit-panel',
     'reviewButtonSelector' => '.js-review-button',
+    'commitRowSelector' => '.js-commit-row',
+    'selectedCommitRowClass' => 'selected-row'
 ];
 CommitSummaryAsset::register($this, $jsOptions);
 ?>
