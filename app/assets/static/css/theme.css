@@ -31,6 +31,14 @@ body {
 .diff-table {
     width: 100%;
 }
+.diff-table tr:hover {
+    cursor: pointer;
+    background-color: #f8f8e0;
+}
+
+.diff-table tr.selected-row {
+    background-color: #f8e5a3;
+}
 .diff-table td {
     padding-top: 5px;
     padding-bottom: 5px;
